@@ -74,20 +74,19 @@ jobs:
         $newVersion = "v$major.$basic.$minor"
         echo "new_version=$newVersion" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-	# Create a new GitHub release using the latest commit message as the body
-	- name: Create GitHub Release
-  	id: create_release
-  	uses: actions/create-release@v1
-  	env:
-    	GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  	if: ${{ env.new_version != '' }}
-  	with:
-    	tag_name: ${{ env.new_version }}
-    	release_name: Z80 Emulator Release ${{ env.new_version }}
-    	body: ${{ github.event.head_commit.message }}
-    	draft: false
-    	prerelease: false
-
+    # Create a new GitHub release using the latest commit message as the body
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      if: ${{ env.new_version != '' }}
+      with:
+        tag_name: ${{ env.new_version }}
+        release_name: Z80 Emulator Release ${{ env.new_version }}
+        body: ${{ github.event.head_commit.message }}
+        draft: false
+        prerelease: false
 
     # Upload the ZIP artifact to the release
     - name: Upload Build to Release
