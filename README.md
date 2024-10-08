@@ -203,7 +203,7 @@ This project is part of ongoing research. Future work:
 - Implementing more accurate timing and interrupts.
 - Adding memory-mapped I/O and display simulation.
 - Improving the CLI with additional commands for debugging.
-- External GUI for displaying CPU Calls and Memory R/W actions
+- External GUI for displaying CPU Calls and Memory R/W actions.
 
 ## License
 This project is for educational and research purposes only.
