@@ -5,6 +5,8 @@ VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Z80-Emu", "Z80-Emu\Z80-Emu.vcxproj", "{30F83994-5872-4713-AF4F-2548474C4041}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ROMExample", "ROMExample\ROMExample.vcxproj", "{BDFB0B9E-AB68-4F2B-89D3-108E70BEB301}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{30F83994-5872-4713-AF4F-2548474C4041}.Release|x64.Build.0 = Release|x64
 		{30F83994-5872-4713-AF4F-2548474C4041}.Release|x86.ActiveCfg = Release|Win32
 		{30F83994-5872-4713-AF4F-2548474C4041}.Release|x86.Build.0 = Release|Win32
+		{BDFB0B9E-AB68-4F2B-89D3-108E70BEB301}.Debug|x64.ActiveCfg = Debug|x64
+		{BDFB0B9E-AB68-4F2B-89D3-108E70BEB301}.Debug|x64.Build.0 = Debug|x64
+		{BDFB0B9E-AB68-4F2B-89D3-108E70BEB301}.Debug|x86.ActiveCfg = Debug|Win32
+		{BDFB0B9E-AB68-4F2B-89D3-108E70BEB301}.Debug|x86.Build.0 = Debug|Win32
+		{BDFB0B9E-AB68-4F2B-89D3-108E70BEB301}.Release|x64.ActiveCfg = Release|x64
+		{BDFB0B9E-AB68-4F2B-89D3-108E70BEB301}.Release|x64.Build.0 = Release|x64
+		{BDFB0B9E-AB68-4F2B-89D3-108E70BEB301}.Release|x86.ActiveCfg = Release|Win32
+		{BDFB0B9E-AB68-4F2B-89D3-108E70BEB301}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

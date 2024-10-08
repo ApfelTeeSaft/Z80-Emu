@@ -1,36 +1,38 @@
 #include "CLI.hpp"
+#include "CPU.hpp"
+#include "ROMLoader.hpp"
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <windows.h>
+#include <commdlg.h>
+#include <string>
 
-double evaluateExpression(Z80Emulator& emulator, const std::string& expr) {
-    std::stringstream ss(expr);
-    double result = 0.0;
-    double num = 0.0;
-    char op = '+';
+std::string openFileDialog() {
+    OPENFILENAME ofn;
+    wchar_t szFile[260];
 
-    emulator.reset();
+    ZeroMemory(&ofn, sizeof(ofn));
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = NULL;
+    ofn.lpstrFile = szFile;
+    ofn.lpstrFile[0] = '\0';
+    ofn.nMaxFile = sizeof(szFile) / sizeof(szFile[0]);
+    ofn.lpstrFilter = L"ROM Files\0*.rom\0All Files\0*.*\0";
+    ofn.nFilterIndex = 1;
+    ofn.lpstrFileTitle = NULL;
+    ofn.nMaxFileTitle = 0;
+    ofn.lpstrInitialDir = NULL;
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-    ss >> num;
-    emulator.executeArithmeticInstruction(1, num);
-
-    while (ss >> op >> num) {
-        if (op == '+') {
-            emulator.executeArithmeticInstruction(1, num);
-        }
-        else if (op == '-') {
-            emulator.executeArithmeticInstruction(2, num);
-        }
-        else if (op == '*') {
-            emulator.executeArithmeticInstruction(3, num);
-        }
-        else if (op == '/') {
-            emulator.executeArithmeticInstruction(4, num);
-        }
+    if (GetOpenFileNameW(&ofn) == TRUE) {
+        // Convert the wide string (wchar_t*) to a regular string (std::string)
+        std::wstring ws(szFile);
+        std::string filepath(ws.begin(), ws.end());
+        return filepath;
     }
 
-    result = emulator.getAccumulator();
-    return result;
+    return "";
 }
 
 void cli(Z80Emulator& emulator) {
@@ -49,7 +51,7 @@ void cli(Z80Emulator& emulator) {
             uint16_t address;
             ss >> programData >> std::hex >> address;
 
-            // hex to byte vec
+            // Convert hex to byte vec
             std::vector<uint8_t> program;
             for (size_t i = 0; i < programData.length(); i += 2) {
                 uint8_t byte = std::stoi(programData.substr(i, 2), nullptr, 16);
@@ -57,6 +59,25 @@ void cli(Z80Emulator& emulator) {
             }
             emulator.loadProgram(program, address);
             std::cout << "Program loaded at address: " << std::hex << address << std::endl;
+        }
+        else if (command == "loadrom") {
+            uint16_t address;
+            ss >> std::hex >> address;
+
+            std::string filepath = openFileDialog();
+            if (!filepath.empty()) {
+                if (loadROM(filepath, emulator, address)) {
+                    emulator.setProgramCounter(address);
+                    std::cout << "ROM loaded successfully from " << filepath << " into address " << std::hex << address << std::endl;
+                    std::cout << "Program Counter after ROM load: " << std::hex << emulator.getProgramCounter() << std::endl;  // Add this log
+                }
+                else {
+                    std::cerr << "Failed to load ROM." << std::endl;
+                }
+            }
+            else {
+                std::cerr << "No file selected." << std::endl;
+            }
         }
         else if (command == "run") {
             emulator.run();
@@ -71,19 +92,15 @@ void cli(Z80Emulator& emulator) {
             emulator.reset();
             std::cout << "Emulator reset." << std::endl;
         }
-        else if (command == "calc") {
-            std::string expression;
-            std::getline(ss, expression);
-
-            expression.erase(0, expression.find_first_not_of(' '));
-            expression.erase(expression.find_last_not_of(' ') + 1);
-
-            try {
-                double result = evaluateExpression(emulator, expression);
-                std::cout << "Result: " << result << std::endl;
+        else if (command == "button") {
+            std::string button;
+            ss >> button;
+            std::string imprint = emulator.getButtonImprint(button);
+            if (!imprint.empty()) {
+                std::cout << "Button '" << button << "' is imprinted with '" << imprint << "'" << std::endl;
             }
-            catch (const std::exception& e) {
-                std::cerr << "Error calculating expression: " << e.what() << std::endl;
+            else {
+                std::cout << "Button '" << button << "' has no imprint or is not defined." << std::endl;
             }
         }
         else if (command == "exit") {
@@ -91,7 +108,7 @@ void cli(Z80Emulator& emulator) {
         }
         else {
             std::cout << "Unknown command: " << command << std::endl;
-            std::cout << "Available commands: load, run, step, registers, reset, calc, exit" << std::endl;
+            std::cout << "Available commands: load, loadrom, run, step, registers, reset, button, exit" << std::endl;
         }
     }
 }

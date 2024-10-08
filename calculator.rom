@@ -1,0 +1,5 @@
+3E 05       ; LD A, 5         ; Load 5 into register A
+06 03       ; LD B, 3         ; Load 3 into register B
+80          ; ADD A, B        ; Add A + B (A = A + B)
+90          ; SUB A, B        ; Subtract B from A (A = A - B)
+C9          ; RET             ; Return (end the program)
