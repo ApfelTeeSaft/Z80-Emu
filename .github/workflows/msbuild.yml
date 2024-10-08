@@ -43,9 +43,9 @@ jobs:
     # Zip the build output
     - name: Zip build output
       run: |
-        $outputPath = "${{ env.GITHUB_WORKSPACE }}\x64\${{ env.BUILD_CONFIGURATION }}"
+        $outputPath = "${{ env.GITHUB_WORKSPACE }}\\x64\\${{ env.BUILD_CONFIGURATION }}"
         if (Test-Path -Path $outputPath) {
-          Compress-Archive -Path "$outputPath\*" -DestinationPath "$outputPath\Z80-Emu.zip"
+          Compress-Archive -Path "$outputPath\\*" -DestinationPath "$outputPath\\Z80-Emu.zip"
         } else {
           Write-Host "Directory $outputPath does not exist"
         }
@@ -53,11 +53,11 @@ jobs:
     # Debug: List the directory contents to check if the file exists
     - name: List build directory contents
       run: |
-        dir "${{ env.GITHUB_WORKSPACE }}\x64\${{ env.BUILD_CONFIGURATION }}"
+        dir "${{ env.GITHUB_WORKSPACE }}\\x64\\${{ env.BUILD_CONFIGURATION }}"
 
     # Upload the zipped build artifact for archiving
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v3
       with:
         name: build-artifact
-        path: ${{ env.GITHUB_WORKSPACE }}\x64\${{ env.BUILD_CONFIGURATION }}\Z80-Emu.zip
+        path: ${{ env.GITHUB_WORKSPACE }}\\x64\\${{ env.BUILD_CONFIGURATION }}\\Z80-Emu.zip
