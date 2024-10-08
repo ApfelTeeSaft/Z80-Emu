@@ -3,24 +3,31 @@
 #include <sstream>
 #include <stdexcept>
 
-double evaluateExpression(const std::string& expr) {
+double evaluateExpression(Z80Emulator& emulator, const std::string& expr) {
     std::stringstream ss(expr);
     double result = 0;
     double num = 0;
     char op = '+';
 
-    while (ss >> num) {
+    ss >> num;
+    emulator.executeArithmeticInstruction(1, static_cast<int>(num));
+
+    while (ss >> op >> num) {
         if (op == '+') {
-            result += num;
+            emulator.executeArithmeticInstruction(1, static_cast<int>(num));
         }
         else if (op == '-') {
-            result -= num;
+            emulator.executeArithmeticInstruction(2, static_cast<int>(num));
         }
-
-        ss >> op;
-        if (ss.fail()) break;
+        else if (op == '*') {
+            emulator.executeArithmeticInstruction(3, static_cast<int>(num));
+        }
+        else if (op == '/') {
+            emulator.executeArithmeticInstruction(4, static_cast<int>(num));
+        }
     }
 
+    result = emulator.getAccumulator(); // final result from the CPU
     return result;
 }
 
@@ -40,7 +47,7 @@ void cli(Z80Emulator& emulator) {
             uint16_t address;
             ss >> programData >> std::hex >> address;
 
-            // Convert hex to byte vec
+            // hex to byte vec
             std::vector<uint8_t> program;
             for (size_t i = 0; i < programData.length(); i += 2) {
                 uint8_t byte = std::stoi(programData.substr(i, 2), nullptr, 16);
@@ -70,7 +77,7 @@ void cli(Z80Emulator& emulator) {
             expression.erase(expression.find_last_not_of(' ') + 1);
 
             try {
-                double result = evaluateExpression(expression);
+                double result = evaluateExpression(emulator, expression);
                 std::cout << "Result: " << result << std::endl;
             }
             catch (const std::exception& e) {

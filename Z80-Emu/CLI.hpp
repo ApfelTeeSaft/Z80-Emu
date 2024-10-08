@@ -2,9 +2,10 @@
 #define CLI_HPP
 
 #include "CPU.hpp"
-#include <string>
+
+// evaluate arithmetic expressions
+double evaluateExpression(Z80Emulator& emulator, const std::string& expr);
 
 void cli(Z80Emulator& emulator);
-double evaluateExpression(const std::string& expr);
 
 #endif

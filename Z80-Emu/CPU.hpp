@@ -5,7 +5,6 @@
 #include <cstdint>
 #include <iostream>
 
-// Define memory size
 const int MEMORY_SIZE = 0xFFFF; // 64 KB
 
 // Registers of Z80
@@ -29,6 +28,10 @@ public:
     void step();
     void displayRegisters() const;
     void reset();
+    int getAccumulator() const;
+
+    // handle instructions for calculator
+    void executeArithmeticInstruction(int operation, int operand);
 
 private:
     Z80Registers regs;

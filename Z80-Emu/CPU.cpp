@@ -1,8 +1,15 @@
 #include "CPU.hpp"
+#include <stdexcept>
 
 Z80Emulator::Z80Emulator() {
     reset();
 }
+
+// Poopy result
+int Z80Emulator::getAccumulator() const {
+    return regs.a;
+}
+
 
 // Load program into memory
 void Z80Emulator::loadProgram(const std::vector<uint8_t>& program, uint16_t startAddress) {
@@ -38,12 +45,33 @@ void Z80Emulator::displayRegisters() const {
     std::cout << std::endl;
 }
 
-// Reset registers and mem
+// Reset
 void Z80Emulator::reset() {
     regs.pc = 0x0000;
     regs.sp = 0xFFFF;
     regs.a = regs.f = regs.b = regs.c = regs.d = regs.e = regs.h = regs.l = 0x00;
-    memory.resize(MEMORY_SIZE, 0); // Clear memory
+    memory.resize(MEMORY_SIZE, 0); // Clear mem
+}
+
+// arithmetic operations for the calculator
+void Z80Emulator::executeArithmeticInstruction(int operation, int operand) {
+    switch (operation) {
+    case 1: // Add
+        regs.a += operand;
+        break;
+    case 2: // Subtract
+        regs.a -= operand;
+        break;
+    case 3: // Multiply
+        regs.a *= operand;
+        break;
+    case 4: // Divide
+        if (operand == 0) throw std::runtime_error("Division by zero");
+        regs.a /= operand;
+        break;
+    default:
+        throw std::invalid_argument("Unknown instruction");
+    }
 }
 
 // Execute the fetched opcode
