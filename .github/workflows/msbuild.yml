@@ -33,16 +33,20 @@ jobs:
         name: release-zip
         path: ./x64/Release/Z80-Emu.zip
 
-    # Get the latest release version using GitHub CLI
+    # Get the latest release version using GitHub CLI with GH_TOKEN
     - name: Get Latest Release Version
       id: get_latest_release
-      run: echo "::set-output name=LATEST_TAG::$(gh release view --json tagName --jq '.tagName')"
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        latest_tag=$(gh release view --json tagName --jq '.tagName')
+        echo "LATEST_TAG=$latest_tag" >> $GITHUB_ENV
 
     # Set new version based on commit message keywords
     - name: Determine New Version
       id: new_version
       run: |
-        latest_version=${{ steps.get_latest_release.outputs.LATEST_TAG }}
+        latest_version=${{ env.LATEST_TAG }}
         major=$(echo $latest_version | cut -d. -f1 | cut -dv -f2)
         basic=$(echo $latest_version | cut -d. -f2)
         minor=$(echo $latest_version | cut -d. -f3)
