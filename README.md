@@ -194,7 +194,7 @@ This will terminate the emulator and return to your terminal.
     exit
     ```
 
-## Future Work
+## Future Work:
 
 This project is part of ongoing research. Future work:
 - **Adding a GUI**: A graphical user interface (GUI) using **ImGui** will be added in a future update.
