@@ -33,7 +33,7 @@ jobs:
         name: release-zip
         path: ./x64/Release/Z80-Emu.zip
 
-    # Get the latest release version using GitHub CLI with GH_TOKEN
+    # Get the latest release version using GitHub CLI with GH_TOKEN, or fallback to git if CLI fails
     - name: Get Latest Release Version
       id: get_latest_release
       env:
@@ -42,13 +42,22 @@ jobs:
       continue-on-error: true
       run: |
         try {
+          # Attempt to get latest tag using GitHub CLI
+          $latestTagOutput = gh release view --json tagName
+          echo "DEBUG: Raw gh release output: $latestTagOutput"
+          
           $latestTag = gh release view --json tagName --jq '.tagName'
-          echo "Latest Tag Found: $latestTag"
+          echo "DEBUG: Latest tag retrieved using gh CLI: $latestTag"
         } catch {
-          $latestTag = "v1.0.0"
-          echo "No release found, defaulting to: $latestTag"
+          # Fallback to git if the CLI fails
+          $latestTag = $(git describe --tags `git rev-list --tags --max-count=1`)
+          if (-not $latestTag) {
+            $latestTag = "v1.0.0"
+            echo "DEBUG: No tags found, defaulting to v1.0.0"
+          }
         }
         echo "LATEST_TAG=$latestTag" | Out-File -FilePath $env:GITHUB_ENV -Append
+        echo "DEBUG: Final LATEST_TAG is $latestTag"
 
     # Debugging the tag and commit message
     - name: Debug Latest Tag and Commit Message
