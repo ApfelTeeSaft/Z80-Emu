@@ -45,6 +45,11 @@ jobs:
           Write-Host "Directory $outputPath does not exist"
         }
 
+    # Debug: List the directory contents to check if the file exists
+    - name: List directory contents
+      run: |
+        dir ${{env.GITHUB_WORKSPACE}}\x64\${{env.BUILD_CONFIGURATION}}
+
     # Upload the zipped build artifact for archiving
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v3
