@@ -1,0 +1,81 @@
+name: MSBuild
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  # Path to the solution file relative to the root of the project.
+  SOLUTION_FILE_PATH: .
+
+  # Configuration type to build.
+  BUILD_CONFIGURATION: Release
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    # Checkout the code from the repo
+    - uses: actions/checkout@v4
+
+    # Add MSBuild to PATH
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    # Restore NuGet packages
+    - name: Restore NuGet packages
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: nuget restore ${{env.SOLUTION_FILE_PATH}}
+
+    # Build the solution
+    - name: Build
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
+
+    # Zip the build output (assuming the default MSBuild output location)
+    - name: Zip build output
+      run: |
+        Compress-Archive -Path ./bin/${{env.BUILD_CONFIGURATION}}/* -DestinationPath ./bin/${{env.BUILD_CONFIGURATION}}/build-output.zip
+
+    # Upload the zipped build artifact for archiving
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifact
+        path: ./bin/${{env.BUILD_CONFIGURATION}}/build-output.zip
+
+  release:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    # Create a new GitHub release
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v1.0.${{ github.run_number }}
+        release_name: Release v1.0.${{ github.run_number }}
+        body: "New release generated from push to main"
+        draft: false
+        prerelease: false
+
+    # Upload the ZIP artifact to the release
+    - name: Upload Build to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./bin/${{env.BUILD_CONFIGURATION}}/build-output.zip
+        asset_name: build-output.zip
+        asset_content_type: application/zip
