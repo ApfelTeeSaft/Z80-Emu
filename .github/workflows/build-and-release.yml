@@ -18,21 +18,22 @@ jobs:
     - name: Set up MSBuild
       uses: microsoft/setup-msbuild@v1
 
-    # Build the emulator project and output to a specific directory
+    # Build the emulator project and specify the custom output directory
     - name: Build Emulator
       run: |
-        msbuild /p:Configuration=Release /p:Platform=x64 /p:OutDir=./output/ Z80-Emu.sln
+        msbuild /p:Configuration=Release /p:Platform=x64 /p:OutDir=$(System.DefaultWorkingDirectory)/output/ Z80-Emu.sln
 
-    # Zip the build output
+    # Zip the build output in the custom output folder
     - name: Zip build output
-      run: Compress-Archive -Path ./output/* -DestinationPath ./output/Z80-Emu.zip
+      run: |
+        Compress-Archive -Path $(System.DefaultWorkingDirectory)/output/* -DestinationPath $(System.DefaultWorkingDirectory)/output/Z80-Emu.zip
 
     # Archive the zipped build artifact
     - name: Archive Build
       uses: actions/upload-artifact@v3
       with:
         name: emulator-build
-        path: ./output/Z80-Emu.zip
+        path: $(System.DefaultWorkingDirectory)/output/Z80-Emu.zip
         retention-days: 7
 
   release:
@@ -60,6 +61,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./output/Z80-Emu.zip
+        asset_path: $(System.DefaultWorkingDirectory)/output/Z80-Emu.zip
         asset_name: Z80-Emu.zip
         asset_content_type: application/octet-stream
