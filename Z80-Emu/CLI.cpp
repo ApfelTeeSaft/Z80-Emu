@@ -9,6 +9,8 @@ double evaluateExpression(Z80Emulator& emulator, const std::string& expr) {
     double num = 0;
     char op = '+';
 
+    emulator.reset();
+
     ss >> num;
     emulator.executeArithmeticInstruction(1, static_cast<int>(num));
 
