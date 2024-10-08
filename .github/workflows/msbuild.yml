@@ -6,58 +6,29 @@ on:
   pull_request:
     branches: [ "main" ]
 
-env:
-  SOLUTION_FILE_PATH: .
-  BUILD_CONFIGURATION: Release
-
-permissions:
-  contents: read
-
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-    # Checkout the code from the repo
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v2
 
-    # Add MSBuild to PATH
-    - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v2
-
-    # Restore NuGet packages
-    - name: Restore NuGet packages
-      working-directory: ${{ env.GITHUB_WORKSPACE }}
-      run: nuget restore ${{ env.SOLUTION_FILE_PATH }}
-
-    # Build the solution
-    - name: Build
-      working-directory: ${{ env.GITHUB_WORKSPACE }}
-      run: msbuild /m /p:Configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.SOLUTION_FILE_PATH }}
-
-    # List the root directory contents to ensure we know where the build output is located
-    - name: List GITHUB_WORKSPACE
-      run: |
-        dir ${{ env.GITHUB_WORKSPACE }}
-
-    # Zip the build output
-    - name: Zip build output
-      run: |
-        $outputPath = "${{ env.GITHUB_WORKSPACE }}\\x64\\${{ env.BUILD_CONFIGURATION }}"
-        if (Test-Path -Path $outputPath) {
-          Compress-Archive -Path "$outputPath\\*" -DestinationPath "$outputPath\\Z80-Emu.zip"
-        } else {
-          Write-Host "Directory $outputPath does not exist"
-        }
-
-    # Debug: List the directory contents to check if the file exists
-    - name: List build directory contents
-      run: |
-        dir "${{ env.GITHUB_WORKSPACE }}\\x64\\${{ env.BUILD_CONFIGURATION }}"
-
-    # Upload the zipped build artifact for archiving
-    - name: Upload Build Artifact
-      uses: actions/upload-artifact@v3
+    # Set up MSVC developer environment
+    - uses: ilammy/msvc-dev-cmd@v1.4.1
       with:
-        name: build-artifact
-        path: ${{ env.GITHUB_WORKSPACE }}\\x64\\${{ env.BUILD_CONFIGURATION }}\\Z80-Emu.zip
+        arch: x64
+
+    # Build the Z80-Emu project
+    - name: Build Project
+      run: msbuild /m /p:Configuration=Release /p:Platform=x64 Z80-Emu.sln
+
+    # Zip the Release folder
+    - name: Zip Release folder
+      run: Compress-Archive -Path ./x64/Release/* -DestinationPath ./x64/Release/Z80-Emu.zip
+
+    # Upload the zipped Release folder
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: release-zip
+        path: ./x64/Release/Z80-Emu.zip
