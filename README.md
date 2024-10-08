@@ -26,7 +26,7 @@ The emulator includes a command-line interface (CLI) for interacting with the em
 
 1. Clone the repository or download the source files.
 2. Open **Visual Studio 2022**.
-3. Open the .sln project file within Visual Studio 2022.
+3. Open the .sln project file in Visual Studio 2022.
 
 ### Building and Running
 

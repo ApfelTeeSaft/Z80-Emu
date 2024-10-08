@@ -38,14 +38,14 @@ jobs:
     # Zip the build output
     - name: Zip build output
       run: |
-        Compress-Archive -Path ${{env.GITHUB_WORKSPACE}}/x64/${{env.BUILD_CONFIGURATION}}/* -DestinationPath ${{env.GITHUB_WORKSPACE}}/x64/${{env.BUILD_CONFIGURATION}}/Z80-Emu.zip
+        Compress-Archive -Path "${{env.GITHUB_WORKSPACE}}\x64\${{env.BUILD_CONFIGURATION}}\*" -DestinationPath "${{env.GITHUB_WORKSPACE}}\x64\${{env.BUILD_CONFIGURATION}}\Z80-Emu.zip"
 
     # Upload the zipped build artifact for archiving
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v3
       with:
         name: build-artifact
-        path: ${{env.GITHUB_WORKSPACE}}/x64/${{env.BUILD_CONFIGURATION}}/Z80-Emu.zip
+        path: ${{env.GITHUB_WORKSPACE}}\x64\${{env.BUILD_CONFIGURATION}}\Z80-Emu.zip
 
   release:
     if: github.ref == 'refs/heads/main'
@@ -73,6 +73,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.PAT }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{env.GITHUB_WORKSPACE}}/x64/${{env.BUILD_CONFIGURATION}}/Z80-Emu.zip
+        asset_path: ${{env.GITHUB_WORKSPACE}}\x64\${{env.BUILD_CONFIGURATION}}\Z80-Emu.zip
         asset_name: Z80-Emu.zip
         asset_content_type: application/zip
