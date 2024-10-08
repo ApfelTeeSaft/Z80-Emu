@@ -33,6 +33,43 @@ jobs:
         name: release-zip
         path: ./x64/Release/Z80-Emu.zip
 
+    # Fetch the latest release tag
+    - name: Get Latest Release
+      id: get_latest_release
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const latestRelease = await github.repos.getLatestRelease({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+          });
+          return latestRelease.data.tag_name;
+
+    # Set new version based on commit message keywords
+    - name: Determine New Version
+      id: new_version
+      run: |
+        latest_version=${{ steps.get_latest_release.outputs.result }} # e.g. v1.0.0
+        major=$(echo $latest_version | cut -d. -f1 | cut -dv -f2)
+        basic=$(echo $latest_version | cut -d. -f2)
+        minor=$(echo $latest_version | cut -d. -f3)
+
+        commit_message="${{ github.event.head_commit.message }}"
+        commit_message_lower=$(echo "$commit_message" | tr '[:upper:]' '[:lower:]')
+
+        if [[ "$commit_message_lower" == *"major"* ]]; then
+          major=$((major+1))
+          basic=0
+          minor=0
+        elif [[ "$commit_message_lower" == *"basic"* ]]; then
+          basic=$((basic+1))
+          minor=0
+        elif [[ "$commit_message_lower" == *"minor"* ]]; then
+          minor=$((minor+1))
+        fi
+
+        echo "new_version=v$major.$basic.$minor" >> $GITHUB_ENV
+
     # Create a new GitHub release using the latest commit message as the body
     - name: Create GitHub Release
       id: create_release
@@ -40,8 +77,19 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v1.0.${{ github.run_number }}
-        release_name: Z80 Emulator Release v1.0.${{ github.run_number }}
-        body: ${{ github.event.head_commit.message }}  # Use latest commit message as release body
+        tag_name: ${{ env.new_version }}
+        release_name: Z80 Emulator Release ${{ env.new_version }}
+        body: ${{ github.event.head_commit.message }}
         draft: false
         prerelease: false
+
+    # Upload the ZIP artifact to the release
+    - name: Upload Build to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./x64/Release/Z80-Emu.zip
+        asset_name: Z80-Emu.zip
+        asset_content_type: application/zip
