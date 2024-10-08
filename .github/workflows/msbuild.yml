@@ -40,7 +40,7 @@ jobs:
       run: |
         dir ${{ env.GITHUB_WORKSPACE }}
 
-    # Zip the build output (assuming we confirm the correct path)
+    # Zip the build output
     - name: Zip build output
       run: |
         $outputPath = "${{ env.GITHUB_WORKSPACE }}\x64\${{ env.BUILD_CONFIGURATION }}"
@@ -48,6 +48,7 @@ jobs:
           Compress-Archive -Path "$outputPath\*" -DestinationPath "$outputPath\Z80-Emu.zip"
         } else {
           Write-Host "Directory $outputPath does not exist"
+        }
 
     # Debug: List the directory contents to check if the file exists
     - name: List directory contents
