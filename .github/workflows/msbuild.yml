@@ -89,6 +89,7 @@ jobs:
           $minor = [int]$minor + 1
         }
 
+        # Ensure the new version includes all three components
         $newVersion = "v$major.$basic.$minor"
         echo "New version determined: $newVersion"
         echo "::set-output name=new_version::$newVersion"
@@ -106,7 +107,7 @@ jobs:
         draft: false
         prerelease: false
 
-    # Upload the ZIP atifact to the release
+    # Upload the ZIP artifact to the release
     - name: Upload Build to Release
       uses: actions/upload-release-asset@v1
       env:
