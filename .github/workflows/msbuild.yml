@@ -94,8 +94,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ env.new_version }}
-        release_name: Z80 Emulator Release ${{ env.new_version }}
+        tag_name: ${{ steps.new_version.outputs.new_version }}  # Reference the correct version
+        release_name: Z80 Emulator Release ${{ steps.new_version.outputs.new_version }}
         body: ${{ github.event.head_commit.message }}
         draft: false
         prerelease: false
