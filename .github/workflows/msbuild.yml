@@ -38,34 +38,37 @@ jobs:
       id: get_latest_release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: pwsh
       run: |
-        latest_tag=$(gh release view --json tagName --jq '.tagName' || echo "v1.0.0")
-        echo "LATEST_TAG=$latest_tag" >> $GITHUB_ENV
+        $latestTag = gh release view --json tagName --jq '.tagName'
+        if (-not $latestTag) { $latestTag = "v1.0.0" }
+        echo "LATEST_TAG=$latestTag" | Out-File -FilePath $env:GITHUB_ENV -Append
 
     # Set new version based on commit message keywords
     - name: Determine New Version
       id: new_version
+      shell: pwsh
       run: |
-        latest_version=${{ env.LATEST_TAG }}
-        major=$(echo $latest_version | cut -d. -f1 | cut -dv -f2)
-        basic=$(echo $latest_version | cut -d. -f2)
-        minor=$(echo $latest_version | cut -d. -f3)
+        $latestVersion = "${{ env.LATEST_TAG }}"
+        $major = ($latestVersion -split '\.')[0] -replace 'v', ''
+        $basic = ($latestVersion -split '\.')[1]
+        $minor = ($latestVersion -split '\.')[2]
 
-        commit_message="${{ github.event.head_commit.message }}"
-        commit_message_lower=$(echo "$commit_message" | tr '[:upper:]' '[:lower:]')
+        $commitMessage = "${{ github.event.head_commit.message }}".ToLower()
 
-        if [[ "$commit_message_lower" == *"major"* ]]; then
-          major=$((major+1))
-          basic=0
-          minor=0
-        elif [[ "$commit_message_lower" == *"basic"* ]]; then
-          basic=$((basic+1))
-          minor=0
-        elif [[ "$commit_message_lower" == *"minor"* ]]; then
-          minor=$((minor+1))
-        fi
+        if ($commitMessage -contains "major") {
+          $major = [int]$major + 1
+          $basic = 0
+          $minor = 0
+        } elseif ($commitMessage -contains "basic") {
+          $basic = [int]$basic + 1
+          $minor = 0
+        } elseif ($commitMessage -contains "minor") {
+          $minor = [int]$minor + 1
+        }
 
-        echo "new_version=v$major.$basic.$minor" >> $GITHUB_ENV
+        $newVersion = "v$major.$basic.$minor"
+        echo "new_version=$newVersion" | Out-File -FilePath $env:GITHUB_ENV -Append
 
     # Create a new GitHub release using the latest commit message as the body
     - name: Create GitHub Release
