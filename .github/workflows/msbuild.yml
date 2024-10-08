@@ -33,23 +33,16 @@ jobs:
         name: release-zip
         path: ./x64/Release/Z80-Emu.zip
 
-    # Fetch the latest release tag
-    - name: Get Latest Release
+    # Get the latest release version using GitHub CLI
+    - name: Get Latest Release Version
       id: get_latest_release
-      uses: actions/github-script@v6
-      with:
-        script: |
-          const latestRelease = await github.repos.getLatestRelease({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-          });
-          return latestRelease.data.tag_name;
+      run: echo "::set-output name=LATEST_TAG::$(gh release view --json tagName --jq '.tagName')"
 
     # Set new version based on commit message keywords
     - name: Determine New Version
       id: new_version
       run: |
-        latest_version=${{ steps.get_latest_release.outputs.result }} # e.g. v1.0.0
+        latest_version=${{ steps.get_latest_release.outputs.LATEST_TAG }}
         major=$(echo $latest_version | cut -d. -f1 | cut -dv -f2)
         basic=$(echo $latest_version | cut -d. -f2)
         minor=$(echo $latest_version | cut -d. -f3)
