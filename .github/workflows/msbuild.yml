@@ -43,10 +43,18 @@ jobs:
       run: |
         try {
           $latestTag = gh release view --json tagName --jq '.tagName'
+          echo "Latest Tag Found: $latestTag"
         } catch {
           $latestTag = "v1.0.0"
+          echo "No release found, defaulting to: $latestTag"
         }
         echo "LATEST_TAG=$latestTag" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+    # Debugging the tag and commit message
+    - name: Debug Latest Tag and Commit Message
+      run: |
+        echo "DEBUG: LATEST_TAG is ${{ env.LATEST_TAG }}"
+        echo "DEBUG: COMMIT_MESSAGE is '${{ github.event.head_commit.message }}'"
 
     # Set new version based on commit message keywords and output the version
     - name: Determine New Version
@@ -54,6 +62,7 @@ jobs:
       shell: pwsh
       run: |
         $latestVersion = "${{ env.LATEST_TAG }}"
+        echo "Using latest version: $latestVersion"
         $major = ($latestVersion -split '\.')[0] -replace 'v', ''
         $basic = ($latestVersion -split '\.')[1]
         $minor = ($latestVersion -split '\.')[2]
@@ -72,6 +81,7 @@ jobs:
         }
 
         $newVersion = "v$major.$basic.$minor"
+        echo "New version determined: $newVersion"
         echo "::set-output name=new_version::$newVersion"
 
     # Create a new GitHub release using the latest commit message as the body
