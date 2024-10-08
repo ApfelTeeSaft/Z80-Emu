@@ -29,7 +29,7 @@ jobs:
       with:
         name: emulator-build
         path: |
-          x64Release\Z80-Emu.exe
+          x64\Release\Z80-Emu.exe
         retention-days: 7
 
   release:
@@ -37,7 +37,7 @@ jobs:
     needs: build
 
     steps:
-    # Create a release when the build succeeds
+    # Create a release when the build succeeds, using the latest commit message as the release body
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -46,7 +46,7 @@ jobs:
       with:
         tag_name: v1.0.${{ github.run_number }}
         release_name: Z80 Emulator v1.0.${{ github.run_number }}
-        body: "Automatically generated release by GitHub Actions."
+        body: ${{ github.event.head_commit.message }} # Fetch the latest commit message for release body
         draft: false
         prerelease: false
 
