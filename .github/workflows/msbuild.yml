@@ -26,9 +26,9 @@ jobs:
     - name: Zip Release folder
       run: Compress-Archive -Path ./x64/Release/* -DestinationPath ./x64/Release/Z80-Emu.zip
 
-    # Upload the zipped Release folder
+    # Upload the zipped Release folder using v3
     - name: Upload Build Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: release-zip
         path: ./x64/Release/Z80-Emu.zip
