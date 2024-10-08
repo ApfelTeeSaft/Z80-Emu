@@ -39,9 +39,13 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: pwsh
+      continue-on-error: true
       run: |
-        $latestTag = gh release view --json tagName --jq '.tagName'
-        if (-not $latestTag) { $latestTag = "v1.0.0" }
+        try {
+          $latestTag = gh release view --json tagName --jq '.tagName'
+        } catch {
+          $latestTag = "v1.0.0"
+        }
         echo "LATEST_TAG=$latestTag" | Out-File -FilePath $env:GITHUB_ENV -Append
 
     # Set new version based on commit message keywords
