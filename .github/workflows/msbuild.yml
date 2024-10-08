@@ -74,6 +74,14 @@ jobs:
         $newVersion = "v$major.$basic.$minor"
         echo "new_version=$newVersion" | Out-File -FilePath $env:GITHUB_ENV -Append
 
+    # Ensure tag name starts with 'v' and is valid
+    - name: Validate Version Tag
+      shell: pwsh
+      run: |
+        if (-not $newVersion.StartsWith('v')) {
+          echo "new_version=v1.0.0" | Out-File -FilePath $env:GITHUB_ENV -Append
+        }
+
     # Create a new GitHub release using the latest commit message as the body
     - name: Create GitHub Release
       id: create_release
