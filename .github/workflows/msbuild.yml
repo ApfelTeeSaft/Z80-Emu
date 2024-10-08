@@ -48,9 +48,9 @@ jobs:
         }
         echo "LATEST_TAG=$latestTag" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-    # Set new version based on commit message keywords
+    # Set new version based on commit message keywords and output the version
     - name: Determine New Version
-      id: new_version
+      id: determine_version
       shell: pwsh
       run: |
         $latestVersion = "${{ env.LATEST_TAG }}"
@@ -72,20 +72,7 @@ jobs:
         }
 
         $newVersion = "v$major.$basic.$minor"
-        echo "new_version=$newVersion" | Out-File -FilePath $env:GITHUB_ENV -Append
-
-    # Ensure the new_version is not null and valid
-    - name: Validate Version Tag
-      shell: pwsh
-      run: |
-        if (-not $newVersion) {
-          $newVersion = "v1.0.0"
-        }
-        if (-not $newVersion.StartsWith('v')) {
-          $newVersion = "v$major.$basic.$minor"
-        }
-        echo "Validated version: $newVersion"
-        echo "new_version=$newVersion" | Out-File -FilePath $env:GITHUB_ENV -Append
+        echo "::set-output name=new_version::$newVersion"
 
     # Create a new GitHub release using the latest commit message as the body
     - name: Create GitHub Release
@@ -94,8 +81,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ steps.new_version.outputs.new_version }}  # Reference the correct version
-        release_name: Z80 Emulator Release ${{ steps.new_version.outputs.new_version }}
+        tag_name: ${{ steps.determine_version.outputs.new_version }}
+        release_name: Z80 Emulator Release ${{ steps.determine_version.outputs.new_version }}
         body: ${{ github.event.head_commit.message }}
         draft: false
         prerelease: false
