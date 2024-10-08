@@ -38,17 +38,17 @@ jobs:
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
 
-    # Zip the build output (assuming the default MSBuild output location)
+    # Zip the build output
     - name: Zip build output
       run: |
-        Compress-Archive -Path ./bin/${{env.BUILD_CONFIGURATION}}/* -DestinationPath ./bin/${{env.BUILD_CONFIGURATION}}/build-output.zip
+        Compress-Archive -Path ./x64/${{env.BUILD_CONFIGURATION}}/* -DestinationPath ./x64/${{env.BUILD_CONFIGURATION}}/Z80-Emu.zip
 
     # Upload the zipped build artifact for archiving
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v3
       with:
         name: build-artifact
-        path: ./bin/${{env.BUILD_CONFIGURATION}}/build-output.zip
+        path: ./x64/${{env.BUILD_CONFIGURATION}}/Z80-Emu.zip
 
   release:
     if: github.ref == 'refs/heads/main'
@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Create a new GitHub release
+    # Create a new GitHub release using the latest commit message as the release body
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -65,7 +65,7 @@ jobs:
       with:
         tag_name: v1.0.${{ github.run_number }}
         release_name: Release v1.0.${{ github.run_number }}
-        body: "New release generated from push to main"
+        body: ${{ github.event.head_commit.message }} # Use the latest commit message for release body
         draft: false
         prerelease: false
 
@@ -76,6 +76,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./bin/${{env.BUILD_CONFIGURATION}}/build-output.zip
-        asset_name: build-output.zip
+        asset_path: ./x64/${{env.BUILD_CONFIGURATION}}/Z80-Emu.zip
+        asset_name: Z80-Emu.zip
         asset_content_type: application/zip
