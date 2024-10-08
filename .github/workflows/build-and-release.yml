@@ -21,7 +21,7 @@ jobs:
     # Build the emulator project
     - name: Build Emulator
       run: |
-        msbuild /p:Configuration=Release /p:Platform=x64 Emulator.sln
+        msbuild /p:Configuration=Release /p:Platform=x64 Z80-Emu.sln
 
     # Archive the build artifact
     - name: Archive Build
