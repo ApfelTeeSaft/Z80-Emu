@@ -1,7 +1,7 @@
 #include "CPU.hpp"
 #include <stdexcept>
 
-// cpu type shit
+// cpu type shi
 
 Z80Emulator::Z80Emulator() {
     reset();
