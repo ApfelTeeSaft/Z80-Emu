@@ -5,31 +5,31 @@
 
 double evaluateExpression(Z80Emulator& emulator, const std::string& expr) {
     std::stringstream ss(expr);
-    double result = 0;
-    double num = 0;
+    double result = 0.0;
+    double num = 0.0;
     char op = '+';
 
     emulator.reset();
 
     ss >> num;
-    emulator.executeArithmeticInstruction(1, static_cast<int>(num));
+    emulator.executeArithmeticInstruction(1, num);
 
     while (ss >> op >> num) {
         if (op == '+') {
-            emulator.executeArithmeticInstruction(1, static_cast<int>(num));
+            emulator.executeArithmeticInstruction(1, num);
         }
         else if (op == '-') {
-            emulator.executeArithmeticInstruction(2, static_cast<int>(num));
+            emulator.executeArithmeticInstruction(2, num);
         }
         else if (op == '*') {
-            emulator.executeArithmeticInstruction(3, static_cast<int>(num));
+            emulator.executeArithmeticInstruction(3, num);
         }
         else if (op == '/') {
-            emulator.executeArithmeticInstruction(4, static_cast<int>(num));
+            emulator.executeArithmeticInstruction(4, num);
         }
     }
 
-    result = emulator.getAccumulator(); // final result from the CPU
+    result = emulator.getAccumulator();
     return result;
 }
 

@@ -6,12 +6,11 @@ Z80Emulator::Z80Emulator() {
 }
 
 // Poopy result
-int Z80Emulator::getAccumulator() const {
+double Z80Emulator::getAccumulator() const {
     return regs.a;
 }
 
 
-// Load program into memory
 void Z80Emulator::loadProgram(const std::vector<uint8_t>& program, uint16_t startAddress) {
     for (size_t i = 0; i < program.size(); ++i) {
         memory[startAddress + i] = program[i];
@@ -19,7 +18,6 @@ void Z80Emulator::loadProgram(const std::vector<uint8_t>& program, uint16_t star
     regs.pc = startAddress;
 }
 
-// Run the emulator
 void Z80Emulator::run() {
     bool running = true;
     while (running) {
@@ -38,7 +36,7 @@ void Z80Emulator::step() {
 void Z80Emulator::displayRegisters() const {
     std::cout << "PC: " << std::hex << regs.pc << "\n";
     std::cout << "SP: " << std::hex << regs.sp << "\n";
-    std::cout << "A: " << std::hex << (int)regs.a << "\n";
+    std::cout << "A: " << regs.a << "\n";
     std::cout << "B: " << std::hex << (int)regs.b << " C: " << std::hex << (int)regs.c << "\n";
     std::cout << "D: " << std::hex << (int)regs.d << " E: " << std::hex << (int)regs.e << "\n";
     std::cout << "H: " << std::hex << (int)regs.h << " L: " << std::hex << (int)regs.l << "\n";
@@ -49,12 +47,13 @@ void Z80Emulator::displayRegisters() const {
 void Z80Emulator::reset() {
     regs.pc = 0x0000;
     regs.sp = 0xFFFF;
-    regs.a = regs.f = regs.b = regs.c = regs.d = regs.e = regs.h = regs.l = 0x00;
-    memory.resize(MEMORY_SIZE, 0); // Clear mem
+    regs.a = 0.0;
+    regs.f = regs.b = regs.c = regs.d = regs.e = regs.h = regs.l = 0x00;
+    memory.resize(MEMORY_SIZE, 0);
 }
 
 // arithmetic operations for the calculator
-void Z80Emulator::executeArithmeticInstruction(int operation, int operand) {
+void Z80Emulator::executeArithmeticInstruction(int operation, double operand) {
     switch (operation) {
     case 1: // Add
         regs.a += operand;
@@ -102,7 +101,7 @@ void Z80Emulator::executeOpcode(uint8_t opcode) {
         break;
 
     case 0xAF: // XOR A (clear A)
-        regs.a ^= regs.a;
+        regs.a = 0.0;
         break;
 
     case 0xC3: // JP nn (JMP -> nn)

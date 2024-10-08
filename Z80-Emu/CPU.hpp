@@ -11,7 +11,7 @@ const int MEMORY_SIZE = 0xFFFF; // 64 KB
 struct Z80Registers {
     uint16_t pc;  // PC (program counter)
     uint16_t sp;  // Stack pointer
-    uint8_t a;    // Accumulator
+    double a;     // Accumulator
     uint8_t f;    // Flags
     uint8_t b, c; // BC reg pair
     uint8_t d, e; // DE reg pair
@@ -28,10 +28,11 @@ public:
     void step();
     void displayRegisters() const;
     void reset();
-    int getAccumulator() const;
 
-    // handle instructions for calculator
-    void executeArithmeticInstruction(int operation, int operand);
+    void executeArithmeticInstruction(int operation, double operand);
+
+    // getter for accumulator
+    double getAccumulator() const;
 
 private:
     Z80Registers regs;
