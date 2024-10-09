@@ -97,7 +97,7 @@ if ($commitMessage -contains "major") {
     echo "New version determined: $newVersion"
     echo "::set-output name=new_version::$newVersion"
 
-    # Create a new GitHub release using the latest commit message as the body
+    # Create a new GitHub rlease using the latest commit message as the body
     - name: Create GitHub Release
       id: create_release
       uses: actions/create-release@v1
