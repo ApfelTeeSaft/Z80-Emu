@@ -170,5 +170,5 @@ void renderImGui(Z80Emulator& emulator) {
 
         ImGui::End();
     }
-    std::cout << "ImGui Render Loop Finished" << std::endl;
+    // std::cout << "ImGui Render Loop Finished" << std::endl;
 }
