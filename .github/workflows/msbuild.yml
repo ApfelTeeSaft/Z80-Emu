@@ -42,7 +42,7 @@ jobs:
       continue-on-error: true
       run: |
         try {
-          # Attempt to get latest tag using GitHub CLI
+          # Attempt to get the latest tag using GitHub CLI
           $latestTagOutput = gh release view --json tagName
           echo "DEBUG: Raw gh release output: $latestTagOutput"
       
@@ -50,7 +50,7 @@ jobs:
           echo "DEBUG: Latest tag retrieved using gh CLI: $latestTag"
         } catch {
           # Fallback to git if the CLI fails
-          $latestTag = $(git describe --tags `git rev-list --tags --max-count=1`)
+          $latestTag = git describe --tags $(git rev-list --tags --max-count=1)
           if (-not $latestTag) {
             $latestTag = "v1.0.0"
             echo "DEBUG: No tags found, defaulting to v1.0.0"
@@ -58,6 +58,7 @@ jobs:
         }
         echo "LATEST_TAG=$latestTag" | Out-File -FilePath $env:GITHUB_ENV -Append
         echo "DEBUG: Final LATEST_TAG is $latestTag"
+
 
     # Debugging the tag and commit message
     - name: Debug Latest Tag and Commit Message
