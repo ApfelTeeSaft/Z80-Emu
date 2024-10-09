@@ -73,24 +73,24 @@ jobs:
         $latestVersion = "${{ env.LATEST_TAG }}"
         echo "Using latest version: $latestVersion"
 
-        # Split the version and handle missing components
+        # Split the version into major, basic, and minor components
         $versionParts = $latestVersion -replace 'v', '' -split '\.'
-        $major = if ($versionParts[0]) { $versionParts[0] } else { "1" }
-        $basic = if ($versionParts.Length -gt 1) { $versionParts[1] } else { "0" }
-        $minor = if ($versionParts.Length -gt 2) { $versionParts[2] } else { "0" }
+        $major = if ($versionParts[0]) { [int]$versionParts[0] } else { 1 }
+        $basic = if ($versionParts.Length -gt 1) { [int]$versionParts[1] } else { 0 }
+        $minor = if ($versionParts.Length -gt 2) { [int]$versionParts[2] } else { 0 }
 
         $commitMessage = "${{ github.event.head_commit.message }}".ToLower()
 
         # Determine which part of the version to increment
         if ($commitMessage -contains "major") {
-            $major = [int]$major + 1
+            $major++
             $basic = 0
             $minor = 0
         } elseif ($commitMessage -contains "basic") {
-            $basic = [int]$basic + 1
+            $basic++
             $minor = 0
         } elseif ($commitMessage -contains "minor") {
-            $minor = [int]$minor + 1
+            $minor++
         }
 
         # Ensure the new version includes all three components
@@ -99,6 +99,7 @@ jobs:
 
         # Update environment variable for new version
         echo "NEW_VERSION=$newVersion" | Out-File -FilePath $env:GITHUB_ENV -Append
+
 
     # Create a new GitHub release using the latest commit message as the body
     - name: Create GitHub Release
