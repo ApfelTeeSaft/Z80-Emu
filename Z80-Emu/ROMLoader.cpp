@@ -25,16 +25,19 @@ bool loadROM(const std::string& filepath, Z80Emulator& emulator, uint16_t startA
 
     size_t offset = 0;
     size_t halfSize = buffer.size() / 2;
+
+    // Load the program section into emulator memory
     for (size_t i = 0; i < halfSize; ++i) {
         emulator.memory[startAddress + i] = buffer[i];
     }
     emulator.setProgramCounter(startAddress);
 
+    // Read the title (null-terminated within first 32 bytes)
     buttonLayoutTitle.clear();
-    while (buffer[offset] != '\0' && offset < 32) {
+    while (offset < 32 && buffer[offset] != '\0') {
         buttonLayoutTitle += buffer[offset++];
     }
-    offset = 32;
+    offset = 32; // Move the offset to the start of the button layout after the title
 
     std::cout << "Layout Title: " << buttonLayoutTitle << std::endl;
 
@@ -45,6 +48,7 @@ bool loadROM(const std::string& filepath, Z80Emulator& emulator, uint16_t startA
             break;
         }
 
+        // Add new line for each row of buttons
         if (code == '\n') {
             buttonLayout.push_back(std::vector<Button>());
             continue;
@@ -68,6 +72,7 @@ bool loadROM(const std::string& filepath, Z80Emulator& emulator, uint16_t startA
         if (buttonLayout.empty()) {
             buttonLayout.push_back(std::vector<Button>());
         }
+
         buttonLayout.back().push_back(Button{ code, imprint, span });
         std::cout << "Parsed button: '" << imprint << "' with code: " << code << " and span: " << (int)span << std::endl;
     }
