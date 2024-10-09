@@ -118,7 +118,7 @@ void renderImGui(Z80Emulator& emulator) {
                         isOperand1Set = true;
                         operationEntered = true;
 
-                        // Add the operation opcode to memory
+                        // Add the operation opcode to mem
                         switch (operation) {
                         case '+':
                             emulator.addInstructionToMemory(0x80);  // ADD A, B opcode
