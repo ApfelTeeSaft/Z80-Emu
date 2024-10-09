@@ -84,17 +84,17 @@ jobs:
         $commitMessage = "${{ github.event.head_commit.message }}".ToLower()
         echo "DEBUG: Commit Message=$commitMessage"
 
-        # Determine which part of the version to increment
-        if ($commitMessage -contains "major") {
+        # Determine which part of the version to increment (case-insensitive)
+        if ($commitMessage -match "major") {
             $major++
             $basic = 0
             $minor = 0
             echo "DEBUG: Incrementing Major"
-        } elseif ($commitMessage -contains "basic") {
+        } elseif ($commitMessage -match "basic") {
             $basic++
             $minor = 0
             echo "DEBUG: Incrementing Basic"
-        } elseif ($commitMessage -contains "minor") {
+        } elseif ($commitMessage -match "minor") {
             $minor++
             echo "DEBUG: Incrementing Minor"
         } else {
