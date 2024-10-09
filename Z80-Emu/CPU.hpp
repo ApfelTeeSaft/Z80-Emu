@@ -38,6 +38,11 @@ public:
     void displayRegisters() const;
     std::vector<uint8_t> memory;
 
+    void loadImmediateA(uint8_t value);         // Load immediate value into register A
+    void loadImmediateB(uint8_t value);         // Load immediate value into register B
+    void addInstructionToMemory(uint8_t opcode); // Add opcode to emulator memory
+    uint8_t getRegisterA() const;               // Get the value from register A
+
     void setButtonLayout(const std::map<std::string, std::string>& layout);
     std::string getButtonImprint(const std::string& button) const;
     uint16_t getProgramCounter() const {

@@ -9,6 +9,11 @@
 #include <locale>
 #include <codecvt>
 
+int operand1 = 0, operand2 = 0;
+char operation = '\0';  // The operator (+, -, *, /)
+bool isOperand1Set = false;
+bool operationEntered = false;
+
 std::wstring openFileDialog() {
     wchar_t fileName[MAX_PATH] = L"";
     OPENFILENAMEW ofn;
@@ -84,12 +89,70 @@ void renderImGui(Z80Emulator& emulator) {
     if (!buttonLayout.empty()) {
         ImGui::Begin(buttonLayoutTitle.c_str());
 
-        int buttonID = 0;
         for (const auto& row : buttonLayout) {
             for (const auto& button : row) {
-                std::string buttonLabel = button.imprint + "##button" + std::to_string(buttonID++);
+                std::string buttonLabel = button.imprint + "##button" + std::to_string(rand()); // Unique button ID
+
+                // Handle button press
                 if (ImGui::Button(buttonLabel.c_str(), ImVec2(50 * button.span, 50))) {
-                    std::cout << "Button '" << button.imprint << "' pressed!" << std::endl;
+                    char pressedKey = button.imprint[0];
+
+                    // Check if it's a number (0-9)
+                    if (pressedKey >= '0' && pressedKey <= '9') {
+                        int value = pressedKey - '0';  // Convert char to int
+
+                        // Load value into emulator registers
+                        if (!isOperand1Set) {
+                            operand1 = operand1 * 10 + value;
+                            emulator.loadImmediateA(operand1);  // Load into register A
+                            std::cout << "Operand 1: " << operand1 << std::endl;
+                        }
+                        else {
+                            operand2 = operand2 * 10 + value;
+                            emulator.loadImmediateB(operand2);  // Load into register B
+                            std::cout << "Operand 2: " << operand2 << std::endl;
+                        }
+                    }
+                    else if (pressedKey == '+' || pressedKey == '-' || pressedKey == '*' || pressedKey == '/') {
+                        operation = pressedKey;
+                        isOperand1Set = true;
+                        operationEntered = true;
+
+                        // Add the operation opcode to memory
+                        switch (operation) {
+                        case '+':
+                            emulator.addInstructionToMemory(0x80);  // ADD A, B opcode
+                            break;
+                        case '-':
+                            emulator.addInstructionToMemory(0x90);  // SUB A, B opcode
+                            break;
+                            // Handle multiplication and division similarly
+                        }
+                    }
+                    else if (pressedKey == '=') {
+                        if (operationEntered) {
+                            emulator.run();  // Run the emulator to perform the operation
+                            uint8_t result = emulator.getRegisterA();  // Get the result from register A
+                            std::cout << "Result (in emulator): " << (int)result << std::endl;
+                        }
+
+                        // Reset for next calculation
+                        operand1 = 0;
+                        operand2 = 0;
+                        operation = '\0';
+                        isOperand1Set = false;
+                        operationEntered = false;
+                    }
+                    else if (pressedKey == 'C') {
+                        // Clear everything
+                        operand1 = 0;
+                        operand2 = 0;
+                        operation = '\0';
+                        isOperand1Set = false;
+                        operationEntered = false;
+                        emulator.reset();  // Reset emulator state
+                        std::cout << "Calculator cleared." << std::endl;
+                    }
                 }
                 ImGui::SameLine();
             }

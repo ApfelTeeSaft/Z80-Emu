@@ -134,6 +134,30 @@ void Z80Emulator::run() {
     }
 }
 
+// Load immediate value into register A
+void Z80Emulator::loadImmediateA(uint8_t value) {
+    regs.a = value;  // Directly load value into the A register
+    std::cout << "Loaded " << (int)value << " into register A" << std::endl;
+}
+
+// Load immediate value into register B
+void Z80Emulator::loadImmediateB(uint8_t value) {
+    regs.b = value;  // Directly load value into the B register
+    std::cout << "Loaded " << (int)value << " into register B" << std::endl;
+}
+
+// Add an instruction (opcode) to memory
+void Z80Emulator::addInstructionToMemory(uint8_t opcode) {
+    memory[regs.pc++] = opcode;  // Add the instruction at the current PC and increment PC
+    std::cout << "Added opcode 0x" << std::hex << (int)opcode << " to memory at PC " << std::hex << (int)(regs.pc - 1) << std::endl;
+}
+
+// Get the value from register A
+uint8_t Z80Emulator::getRegisterA() const {
+    return regs.a;
+}
+
+
 void Z80Emulator::step() {
     uint8_t opcode = memory[regs.pc++];
     auto it = opcodeMap.find(opcode);
