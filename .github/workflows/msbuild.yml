@@ -18,7 +18,7 @@ jobs:
       with:
         arch: x64
 
-    # Build the Z80-Emu project
+    # Build the Z80-Emu projec
     - name: Build Project
       run: msbuild /m /p:Configuration=Release /p:Platform=x64 Z80-Emu.sln
 
