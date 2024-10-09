@@ -58,19 +58,44 @@ void renderImGui(Z80Emulator& emulator) {
         loadRomFromFile(emulator);
     }
 
-    // Program counter display
     ImGui::Text("Program Counter: 0x%04X", emulator.getProgramCounter());
 
-    // Render calculator layout dynamically based on ROM
+    if (ImGui::Button("Run##run")) {
+        emulator.run();
+        std::cout << "Emulator started" << std::endl;
+    }
+
+    if (ImGui::Button("Reset##reset")) {
+        emulator.reset();
+        std::cout << "Emulator reset" << std::endl;
+    }
+
+    if (ImGui::Button("Step##step")) {
+        emulator.step();
+        std::cout << "Stepped to next opcode" << std::endl;
+    }
+
+    ImGui::InputInt("Set PC##pcinput", &pcValue);
+    if (ImGui::Button("Set PC##setpc")) {
+        if (pcValue >= 0 && pcValue < 0xFFFF) {
+            emulator.setProgramCounter(static_cast<uint16_t>(pcValue));
+            std::cout << "Program Counter set to: 0x" << std::hex << pcValue << std::endl;
+        }
+        else {
+            std::cerr << "Invalid Program Counter value!" << std::endl;
+        }
+    }
+
+    ImGui::End();
+
     if (!buttonLayout.empty()) {
         ImGui::Begin("Calculator");
 
         for (const auto& row : buttonLayout) {
             for (const auto& button : row) {
-                // Adjust span for buttons that take up multiple columns
                 if (ImGui::Button(button.imprint.c_str(), ImVec2(50 * button.span, 50))) {
                     std::cout << "Button '" << button.imprint << "' pressed!" << std::endl;
-                    // implement button logic here
+                    // button input here
                 }
                 ImGui::SameLine();
             }
@@ -79,6 +104,4 @@ void renderImGui(Z80Emulator& emulator) {
 
         ImGui::End();
     }
-
-    ImGui::End();
 }
