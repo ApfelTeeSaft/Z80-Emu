@@ -20,7 +20,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 std::atomic<bool> running(true);
 
-// Main code
+
 int main(int, char**) {
     WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, _T("ImGui DirectX9 Example"), NULL };
     RegisterClassEx(&wc);

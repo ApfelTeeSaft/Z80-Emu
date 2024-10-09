@@ -3,7 +3,7 @@
 
 #include "CPU.hpp"
 
-// evaluate arithmetic expressions
+
 double evaluateExpression(Z80Emulator& emulator, const std::string& expr);
 
 void cli(Z80Emulator& emulator);

@@ -5,11 +5,11 @@
 #include <string>
 #include "CPU.hpp"
 
-// Struct to represent a button
+
 struct Button {
-    char code;       // Button ASCII code (e.g., '0', '+', '-')
-    std::string imprint;  // Imprint on the button (e.g., "0", "+")
-    int span;        // How many columns the button spans
+    char code;
+    std::string imprint;
+    int span;
 };
 
 extern std::vector<std::vector<Button>> buttonLayout;

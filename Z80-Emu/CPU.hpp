@@ -10,21 +10,21 @@
 
 #define MEMORY_SIZE 65536
 
-// Flags for the Z80 processor
+
 enum Z80Flags {
-    FLAG_S = 0x80,  // Sign flag
-    FLAG_Z = 0x40,  // Zero flag
-    FLAG_H = 0x10,  // Half carry flag
-    FLAG_PV = 0x04, // Parity/overflow flag
-    FLAG_N = 0x02,  // Subtract flag
-    FLAG_C = 0x01   // Carry flag
+    FLAG_S = 0x80,
+    FLAG_Z = 0x40,
+    FLAG_H = 0x10,
+    FLAG_PV = 0x04,
+    FLAG_N = 0x02,
+    FLAG_C = 0x01
 };
 
-// Z80 Reg
+
 struct Z80Registers {
-    uint16_t pc;  // Program counter
-    uint16_t sp;  // Stack pointer
-    uint8_t a, f, b, c, d, e, h, l;  // 8-bit registers
+    uint16_t pc;
+    uint16_t sp;
+    uint8_t a, f, b, c, d, e, h, l;
 };
 
 class Z80Emulator {
@@ -47,8 +47,8 @@ public:
 
 private:
     Z80Registers regs;
-    std::unordered_map<uint8_t, std::function<void()>> opcodeMap;  // Map for opcode execution
-    std::map<std::string, std::string> buttonLayout;  // Button layout and imprints
+    std::unordered_map<uint8_t, std::function<void()>> opcodeMap;
+    std::map<std::string, std::string> buttonLayout;
 
     void setFlag(Z80Flags flag, bool condition);
     bool getFlag(Z80Flags flag) const;

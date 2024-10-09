@@ -3,7 +3,7 @@
 
 #include "CPU.hpp"
 
-// render the ImGui interface
+
 void renderImGui(Z80Emulator& emulator);
 
 #endif

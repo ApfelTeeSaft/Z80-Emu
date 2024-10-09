@@ -11,57 +11,60 @@ void generateCalculatorROM(const std::string& filepath) {
         return;
     }
 
-    // Program Section (First half)
+
     std::vector<uint8_t> programData = {
-        0x3E, 0x0A,  // LD A, 0x0A
-        0x06, 0x14,  // LD B, 0x14
-        0x0E, 0x20,  // LD C, 0x20
-        0x80,        // ADD A, B
-        0x81,        // ADD A, C
-        0xC9         // RET
+        0x3E, 0x0A,
+        0x06, 0x14,
+        0x0E, 0x20,
+        0x80,
+        0x81,
+        0xC9
     };
 
-    // Write the program data (first half of the ROM)
+
     romFile.write(reinterpret_cast<const char*>(programData.data()), programData.size());
 
-    // Add a title section to the ROM (null-terminated string)
+
     const char* title = "Calculator";
-    romFile.write(title, strlen(title) + 1);  // Null-terminated string for the title
+    romFile.write(title, strlen(title) + 1);
 
-    // Button Layout Section (Second half)
+
     std::vector<uint8_t> buttonLayoutData = {
-        // Row 1: '7', '8', '9', '/'
-        '7', 1, '7',  // Button '7'
-        '8', 1, '8',  // Button '8'
-        '9', 1, '9',  // Button '9'
-        '/', 1, '/',  // Button '/'
-        '\n',         // Line break
 
-        // Row 2: '4', '5', '6', '*'
-        '4', 1, '4',  // Button '4'
-        '5', 1, '5',  // Button '5'
-        '6', 1, '6',  // Button '6'
-        '*', 1, '*',  // Button '*'
-        '\n',         // Line break
+        '7', 1, '7',
+        '8', 1, '8',
+        '9', 1, '9',
+        '/', 1, '/',
+        '\n',
 
-        // Row 3: '1', '2', '3', '-'
-        '1', 1, '1',  // Button '1'
-        '2', 1, '2',  // Button '2'
-        '3', 1, '3',  // Button '3'
-        '-', 1, '-',  // Button '-'
-        '\n',         // Line break
 
-        // Row 4: '0', '=', '+'
-        '0', 2, '0',  // Button '0' spans two columns
-        '=', 1, '=',  // Button '='
-        '+', 1, '+',  // Button '+'
-        '\n',         // Line break
+        '4', 1, '4',
+        '5', 1, '5',
+        '6', 1, '6',
+        '*', 1, '*',
+        '\n',
 
-        // Row 5: 'C' (clear)
-        'C', 4, 'C'   // Button 'C' spans the entire row
+
+        '1', 1, '1',
+        '2', 1, '2',
+        '3', 1, '3',
+        '-', 1, '-',
+        '\n',
+
+
+        '0', 2, '0',
+        '=', 1, '=',
+        '+', 1, '+',
+        '\n',
+
+
+        'C', 4, 'C',
+
+
+        0xFF
     };
 
-    // Write the button layout data
+
     romFile.write(reinterpret_cast<const char*>(buttonLayoutData.data()), buttonLayoutData.size());
 
     romFile.close();

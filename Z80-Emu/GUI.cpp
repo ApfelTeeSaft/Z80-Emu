@@ -33,12 +33,12 @@ std::string ws2s(const std::wstring& wideStr) {
     return converter.to_bytes(wideStr);
 }
 
-// load the selected ROM
+
 void loadRomFromFile(Z80Emulator& emulator) {
     std::wstring filepathW = openFileDialog();
     if (!filepathW.empty()) {
         std::string filepath = ws2s(filepathW);
-        uint16_t startAddress = 0x100;  // Default start address
+        uint16_t startAddress = 0x100;
         if (loadROM(filepath, emulator, startAddress)) {
             emulator.setProgramCounter(startAddress);
             std::cout << "ROM loaded: " << filepath << " at start address: " << std::hex << startAddress << std::endl;
@@ -54,13 +54,15 @@ void renderImGui(Z80Emulator& emulator) {
 
     ImGui::Begin("Emulator Control");
 
+
     if (ImGui::Button("Load ROM##loadrom")) {
         loadRomFromFile(emulator);
     }
 
+
     ImGui::Text("Program Counter: 0x%04X", emulator.getProgramCounter());
 
-    // Control buttons
+
     if (ImGui::Button("Run##run")) {
         emulator.run();
         std::cout << "Emulator started" << std::endl;
@@ -76,6 +78,7 @@ void renderImGui(Z80Emulator& emulator) {
         std::cout << "Stepped to next opcode" << std::endl;
     }
 
+
     ImGui::InputInt("Set PC##pcinput", &pcValue);
     if (ImGui::Button("Set PC##setpc")) {
         if (pcValue >= 0 && pcValue < 0xFFFF) {
@@ -89,14 +92,16 @@ void renderImGui(Z80Emulator& emulator) {
 
     ImGui::End();
 
+
     if (!buttonLayout.empty()) {
         ImGui::Begin(buttonLayoutTitle.c_str());
 
         for (const auto& row : buttonLayout) {
             for (const auto& button : row) {
+
                 if (ImGui::Button(button.imprint.c_str(), ImVec2(50 * button.span, 50))) {
                     std::cout << "Button '" << button.imprint << "' pressed!" << std::endl;
-                    // Handle button press
+
                 }
                 ImGui::SameLine();
             }

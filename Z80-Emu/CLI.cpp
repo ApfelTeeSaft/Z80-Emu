@@ -26,7 +26,7 @@ std::string openFileDialog() {
     ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
     if (GetOpenFileNameW(&ofn) == TRUE) {
-        // Convert the wide string (wchar_t*) to a regular string (std::string)
+
         std::wstring ws(szFile);
         std::string filepath(ws.begin(), ws.end());
         return filepath;
@@ -51,7 +51,7 @@ void cli(Z80Emulator& emulator) {
             uint16_t address;
             ss >> programData >> std::hex >> address;
 
-            // Convert hex to byte vec
+
             std::vector<uint8_t> program;
             for (size_t i = 0; i < programData.length(); i += 2) {
                 uint8_t byte = std::stoi(programData.substr(i, 2), nullptr, 16);
@@ -69,7 +69,7 @@ void cli(Z80Emulator& emulator) {
                 if (loadROM(filepath, emulator, address)) {
                     emulator.setProgramCounter(address);
                     std::cout << "ROM loaded successfully from " << filepath << " into address " << std::hex << address << std::endl;
-                    std::cout << "Program Counter after ROM load: " << std::hex << emulator.getProgramCounter() << std::endl;  // Add this log
+                    std::cout << "Program Counter after ROM load: " << std::hex << emulator.getProgramCounter() << std::endl;
                 }
                 else {
                     std::cerr << "Failed to load ROM." << std::endl;
