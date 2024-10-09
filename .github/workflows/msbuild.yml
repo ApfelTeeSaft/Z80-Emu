@@ -62,42 +62,42 @@ jobs:
     # Debugging the tag and commit message
     - name: Debug Latest Tag and Commit Message
       run: |
-        echo "DEBUG: LATEST_TAG is ${{ env.LATEST_TAG }}"
-        echo "DEBUG: COMMIT_MESSAGE is '${{ github.event.head_commit.message }}'"
+        echo "DEBUG: LATEST_TAG=${{ env.LATEST_TAG }}"
+        echo "DEBUG: Commit Message=${{ github.event.head_commit.message }}"
 
     # Set new version based on commit message keywords and output the version
     - name: Determine New Version
       id: determine_version
       shell: pwsh
       run: |
-$latestVersion = "${{ env.LATEST_TAG }}"
-echo "Using latest version: $latestVersion"
+        $latestVersion = "${{ env.LATEST_TAG }}"
+        echo "Using latest version: $latestVersion"
 
-# Split the version and handle missing components
-$versionParts = $latestVersion -replace 'v', '' -split '\.'
-$major = if ($versionParts[0]) { $versionParts[0] } else { "1" }
-$basic = if ($versionParts.Length -gt 1) { $versionParts[1] } else { "0" }
-$minor = if ($versionParts.Length -gt 2) { $versionParts[2] } else { "0" }
+        # Split the version and handle missing components
+        $versionParts = $latestVersion -replace 'v', '' -split '\.'
+        $major = if ($versionParts[0]) { $versionParts[0] } else { "1" }
+        $basic = if ($versionParts.Length -gt 1) { $versionParts[1] } else { "0" }
+        $minor = if ($versionParts.Length -gt 2) { $versionParts[2] } else { "0" }
 
-$commitMessage = "${{ github.event.head_commit.message }}".ToLower()
+        $commitMessage = "${{ github.event.head_commit.message }}".ToLower()
 
-if ($commitMessage -contains "major") {
-        $major = [int]$major + 1
-        $basic = 0
-        $minor = 0
-    } elseif ($commitMessage -contains "basic") {
-        $basic = [int]$basic + 1
-        $minor = 0
-    } elseif ($commitMessage -contains "minor") {
-        $minor = [int]$minor + 1
-    }
+        if ($commitMessage -contains "major") {
+            $major = [int]$major + 1
+            $basic = 0
+            $minor = 0
+        } elseif ($commitMessage -contains "basic") {
+            $basic = [int]$basic + 1
+            $minor = 0
+        } elseif ($commitMessage -contains "minor") {
+            $minor = [int]$minor + 1
+        }
 
-    # Ensure the new version includes all three components
-    $newVersion = "v$major.$basic.$minor"
-    echo "New version determined: $newVersion"
-    echo "::set-output name=new_version::$newVersion"
+        # Ensure the new version includes all three components
+        $newVersion = "v$major.$basic.$minor"
+        echo "New version determined: $newVersion"
+        echo "::set-output name=new_version::$newVersion"
 
-    # Create a new GitHub rlease using the latest commit message as the body
+    # Create a new GitHub release using the latest commit message as the body
     - name: Create GitHub Release
       id: create_release
       uses: actions/create-release@v1
