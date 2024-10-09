@@ -45,7 +45,7 @@ jobs:
           # Attempt to get latest tag using GitHub CLI
           $latestTagOutput = gh release view --json tagName
           echo "DEBUG: Raw gh release output: $latestTagOutput"
-          
+      
           $latestTag = gh release view --json tagName --jq '.tagName'
           echo "DEBUG: Latest tag retrieved using gh CLI: $latestTag"
         } catch {
