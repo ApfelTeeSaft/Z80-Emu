@@ -4,10 +4,12 @@
 #include <vector>
 #include <cstring>
 
+// Global variable to store the button layout
+std::vector<std::vector<Button>> buttonLayout;
+
 // Global variable to store the layout title
 std::string buttonLayoutTitle;
 
-// Function to load a .rom file into the emulator's memory and button layout
 bool loadROM(const std::string& filepath, Z80Emulator& emulator, uint16_t startAddress) {
     std::ifstream file(filepath, std::ios::binary);
     if (!file.is_open()) {
@@ -46,7 +48,6 @@ bool loadROM(const std::string& filepath, Z80Emulator& emulator, uint16_t startA
     while (offset < buffer.size()) {
         char code = static_cast<char>(buffer[offset++]);  // Button code
         if (code == '\n') {
-            // New line marker, we add a row separation
             buttonLayout.push_back(std::vector<Button>());  // Start a new row
             continue;
         }
