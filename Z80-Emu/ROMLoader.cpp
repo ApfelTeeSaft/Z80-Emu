@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <cstring>
+#include <algorithm>
 
 std::vector<std::vector<Button>> buttonLayout;
 std::string buttonLayoutTitle;
@@ -24,31 +25,55 @@ bool loadROM(const std::string& filepath, Z80Emulator& emulator, uint16_t startA
     }
 
     size_t offset = 0;
-    size_t halfSize = buffer.size() / 2;
 
-    // Load the program section into emulator memory
+    // Load the program section into emulator memory (first half)
+    size_t halfSize = buffer.size() / 2;
     for (size_t i = 0; i < halfSize; ++i) {
         emulator.memory[startAddress + i] = buffer[i];
     }
     emulator.setProgramCounter(startAddress);
 
-    // Read the title (null-terminated within first 32 bytes)
-    buttonLayoutTitle.clear();
-    while (offset < 32 && buffer[offset] != '\0') {
-        buttonLayoutTitle += buffer[offset++];
-    }
-    offset = 32; // Move the offset to the start of the button layout after the title
+    // Look for title section
+    std::string titleStart = "[TITLE_START]";
+    std::string titleEnd = "[TITLE_END]";
 
+    offset = std::search(buffer.begin(), buffer.end(),
+        titleStart.begin(), titleStart.end()) - buffer.begin();
+
+    if (offset >= buffer.size()) {
+        std::cerr << "Error: Title start identifier not found." << std::endl;
+        return false;
+    }
+    offset += titleStart.size();
+
+    buttonLayoutTitle.clear();
+    while (offset < buffer.size() && std::string(buffer.begin() + offset, buffer.begin() + offset + titleEnd.size()) != titleEnd) {
+        buttonLayoutTitle += static_cast<char>(buffer[offset++]);
+    }
+
+    // Move past the title end identifier
+    offset += titleEnd.size();
     std::cout << "Layout Title: " << buttonLayoutTitle << std::endl;
+
+    // Look for button layout start
+    std::string buttonStart = "[BUTTONS_START]";
+    std::string buttonEnd = "[BUTTONS_END]";
+    offset = std::search(buffer.begin(), buffer.end(),
+        buttonStart.begin(), buttonStart.end()) - buffer.begin();
+
+    if (offset >= buffer.size()) {
+        std::cerr << "Error: Button layout start identifier not found." << std::endl;
+        return false;
+    }
+    offset += buttonStart.size();
 
     buttonLayout.clear();
     while (offset < buffer.size()) {
         char code = static_cast<char>(buffer[offset++]);
-        if (code == 0xFF) {
+        if (std::string(buffer.begin() + offset, buffer.begin() + offset + buttonEnd.size()) == buttonEnd) {
             break;
         }
 
-        // Add new line for each row of buttons
         if (code == '\n') {
             buttonLayout.push_back(std::vector<Button>());
             continue;

@@ -22,12 +22,19 @@ void generateCalculatorROM(const std::string& filepath) {
     };
     romFile.write(reinterpret_cast<const char*>(programData.data()), programData.size());
 
-    // Write the title (null-terminated string, with a fixed size of 32 bytes)
+    // Write title section with delimiters
+    std::string titleStart = "[TITLE_START]";
     std::string title = "Calculator";
-    title.resize(32, '\0');  // Ensure the title has enough space and is null-terminated
-    romFile.write(title.c_str(), title.size());
+    std::string titleEnd = "[TITLE_END]";
 
-    // Button Layout Section
+    romFile.write(titleStart.c_str(), titleStart.size());
+    romFile.write(title.c_str(), title.size());
+    romFile.write(titleEnd.c_str(), titleEnd.size());
+
+    // Button Layout Section with delimiters
+    std::string buttonStart = "[BUTTONS_START]";
+    romFile.write(buttonStart.c_str(), buttonStart.size());
+
     std::vector<uint8_t> buttonLayoutData = {
         '7', 1, 1, '7',  // Button '7'
         '8', 1, 1, '8',  // Button '8'
@@ -49,15 +56,16 @@ void generateCalculatorROM(const std::string& filepath) {
         '+', 1, 1, '+',  // Button '+'
         '\n',            // Line break
         'C', 4, 1, 'C',  // Button 'C' (span 4 columns)
-        0xFF             // End marker for button layout
     };
 
     romFile.write(reinterpret_cast<const char*>(buttonLayoutData.data()), buttonLayoutData.size());
 
+    std::string buttonEnd = "[BUTTONS_END]";
+    romFile.write(buttonEnd.c_str(), buttonEnd.size());
+
     romFile.close();
     std::cout << "Calculator ROM created successfully!" << std::endl;
 }
-
 
 int main() {
     generateCalculatorROM("calculator.rom");
