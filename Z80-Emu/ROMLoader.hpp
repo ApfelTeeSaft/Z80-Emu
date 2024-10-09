@@ -13,6 +13,7 @@ struct Button {
 };
 
 extern std::vector<std::vector<Button>> buttonLayout;
+extern std::string buttonLayoutTitle;
 
 bool loadROM(const std::string& filepath, Z80Emulator& emulator, uint16_t startAddress);
 

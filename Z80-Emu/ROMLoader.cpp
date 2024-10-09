@@ -5,6 +5,7 @@
 #include "CPU.hpp"
 
 std::vector<std::vector<Button>> buttonLayout;
+std::string buttonLayoutTitle;
 
 bool loadROM(const std::string& filepath, Z80Emulator& emulator, uint16_t startAddress) {
     std::ifstream file(filepath, std::ios::binary);
@@ -22,15 +23,23 @@ bool loadROM(const std::string& filepath, Z80Emulator& emulator, uint16_t startA
         return false;
     }
 
+    size_t offset = 0;
     size_t halfSize = buffer.size() / 2;
     for (size_t i = 0; i < halfSize; ++i) {
         emulator.memory[startAddress + i] = buffer[i];
     }
     emulator.setProgramCounter(startAddress);
 
+    buttonLayoutTitle.clear();
+    while (buffer[offset] != '\0') {
+        buttonLayoutTitle += buffer[offset++];
+    }
+    offset++;
+
+    std::cout << "Layout Title: " << buttonLayoutTitle << std::endl;
+
     buttonLayout.clear();
-    size_t offset = halfSize;
-    uint8_t rowCount = buffer[offset++];  // First byte: number of rows
+    uint8_t rowCount = buffer[offset++];  // First byte after the title: number of rows
 
     for (uint8_t row = 0; row < rowCount; ++row) {
         std::vector<Button> rowButtons;
@@ -41,10 +50,8 @@ bool loadROM(const std::string& filepath, Z80Emulator& emulator, uint16_t startA
             std::string imprint((char*)&buffer[offset], imprintSize);  // Imprint text
             offset += imprintSize;
 
+            if (code == '\n') break;
             rowButtons.push_back(Button{ code, imprint, span });
-            if (rowButtons.size() >= 4) {
-                break;
-            }
         }
         buttonLayout.push_back(rowButtons);
     }
