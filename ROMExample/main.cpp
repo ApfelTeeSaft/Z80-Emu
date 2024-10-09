@@ -11,14 +11,14 @@ void generateCalculatorROM(const std::string& filepath) {
         return;
     }
 
-    // Program Section (First half)
+    // Program Section: Z80 Machine Code
+    // Simple calculator operations (addition and subtraction test)
     std::vector<uint8_t> programData = {
-        0x3E, 0x0A,  // LD A, 0x0A
-        0x06, 0x14,  // LD B, 0x14
-        0x0E, 0x20,  // LD C, 0x20
-        0x80,        // ADD A, B
-        0x81,        // ADD A, C
-        0xC9         // RET
+        0x3E, 0x02,  // LD A, 2     (load 2 into A)
+        0x06, 0x03,  // LD B, 3     (load 3 into B)
+        0x80,        // ADD A, B    (A = A + B, i.e., A = 2 + 3 = 5)
+        0xC3, 0x00, 0x10,  // JP 0x1000  (jump to 0x1000 for further operations)
+        0xC9         // RET         (return to the caller)
     };
     romFile.write(reinterpret_cast<const char*>(programData.data()), programData.size());
 
