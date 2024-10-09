@@ -55,7 +55,6 @@ void loadRomFromFile(Z80Emulator& emulator) {
 }
 
 void renderImGui(Z80Emulator& emulator) {
-    std::cout << "ImGui Render Loop Running" << std::endl;
 
     static int pcValue = 0x100;
 
