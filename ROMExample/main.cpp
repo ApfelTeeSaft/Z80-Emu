@@ -11,67 +11,45 @@ void generateCalculatorROM(const std::string& filepath) {
         return;
     }
 
-    // Program Section (First half)
-    // test for now
     std::vector<uint8_t> programData = {
-        0x3E, 0x0A,  // LD A, 0x0A
-        0x06, 0x14,  // LD B, 0x14
-        0x0E, 0x20   // LD C, 0x20
+        0x3E, 0x0A,  // LD A, 0x0A (Load immediate value 0x0A into register A)
+        0x06, 0x14,  // LD B, 0x14 (Load immediate value 0x14 into register B)
+        0x0E, 0x20,  // LD C, 0x20 (Load immediate value 0x20 into register C)
+        0x80,        // ADD A, B (Add the value in register B to register A)
+        0x81,        // ADD A, C (Add the value in register C to register A)
+        0xC9         // RET (Return from the subroutine)
     };
 
-    // Write the program data (first half of the ROM)
     romFile.write(reinterpret_cast<const char*>(programData.data()), programData.size());
 
-    // Button Layout Section (Second half)
-    // Each button has a code (ASCII) and an imprint size, followed by the imprint text
     std::vector<uint8_t> buttonLayoutData = {
-        // Button '0'
-        '0', 1, '0',  // ASCII '0', size 1, imprint '0'
+        5, // Number of rows
 
-        // Button '1'
-        '1', 1, '1',  // ASCII '1', size 1, imprint '1'
+        // Row 1: '7', '8', '9', '/'
+        '7', 1, '7',  // Button '7'
+        '8', 1, '8',  // Button '8'
+        '9', 1, '9',  // Button '9'
+        '/', 1, '/',  // Button '/'
 
-        // Button '2'
-        '2', 1, '2',  // ASCII '2', size 1, imprint '2'
+        // Row 2: '4', '5', '6', '*'
+        '4', 1, '4',  // Button '4'
+        '5', 1, '5',  // Button '5'
+        '6', 1, '6',  // Button '6'
+        '*', 1, '*',  // Button '*'
 
-        // Button '3'
-        '3', 1, '3',  // ASCII '3', size 1, imprint '3'
+        // Row 3: '1', '2', '3', '-'
+        '1', 1, '1',  // Button '1'
+        '2', 1, '2',  // Button '2'
+        '3', 1, '3',  // Button '3'
+        '-', 1, '-',  // Button '-'
 
-        // Button '4'
-        '4', 1, '4',  // ASCII '4', size 1, imprint '4'
+        // Row 4: '0', '=', '+'
+        '0', 2, '0',  // Button '0' spans two columns
+        '=', 1, '=',  // Button '='
+        '+', 1, '+',  // Button '+'
 
-        // Button '5'
-        '5', 1, '5',  // ASCII '5', size 1, imprint '5'
-
-        // Button '6'
-        '6', 1, '6',  // ASCII '6', size 1, imprint '6'
-
-        // Button '7'
-        '7', 1, '7',  // ASCII '7', size 1, imprint '7'
-
-        // Button '8'
-        '8', 1, '8',  // ASCII '8', size 1, imprint '8'
-
-        // Button '9'
-        '9', 1, '9',  // ASCII '9', size 1, imprint '9'
-
-        // Button '+'
-        '+', 1, '+',  // ASCII '+', size 1, imprint '+'
-
-        // Button '-'
-        '-', 1, '-',  // ASCII '-', size 1, imprint '-'
-
-        // Button '*'
-        '*', 1, '*',  // ASCII '*', size 1, imprint '*'
-
-        // Button '/'
-        '/', 1, '/',  // ASCII '/', size 1, imprint '/'
-
-        // Button '='
-        '=', 1, '=',  // ASCII '=', size 1, imprint '='
-
-        // Button 'C' (clear)
-        'C', 1, 'C'   // ASCII 'C', size 1, imprint 'C'
+        // Row 5: 'C' (clear)
+        'C', 4, 'C'   // Button 'C' spans the entire row (4 columns)
     };
 
     // Write the button layout data

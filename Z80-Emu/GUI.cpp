@@ -36,19 +36,16 @@ std::string ws2s(const std::wstring& wideStr) {
 // load the selected ROM
 void loadRomFromFile(Z80Emulator& emulator) {
     std::wstring filepathW = openFileDialog();
-    if (filepathW.empty()) {
+    if (!filepathW.empty()) {
         std::string filepath = ws2s(filepathW);
-        std::cerr << "No file selected." << std::endl;
-        return;
-    }
-
-    uint16_t startAddress = 0x100;
-    std::string filepath = ws2s(filepathW);
-    if (loadROM(filepath, emulator, startAddress)) {
-        emulator.setProgramCounter(startAddress);
-        std::cout << "ROM loaded: " << filepath << " at start address: " << std::hex << startAddress << std::endl;
-    } else {
-        std::cerr << "Failed to load ROM: " << filepath << std::endl;
+        uint16_t startAddress = 0x100;  // Default start address
+        if (loadROM(filepath, emulator, startAddress)) {
+            emulator.setProgramCounter(startAddress);
+            std::cout << "ROM loaded: " << filepath << " at start address: " << std::hex << startAddress << std::endl;
+        }
+        else {
+            std::cerr << "Failed to load ROM: " << filepath << std::endl;
+        }
     }
 }
 
@@ -57,51 +54,31 @@ void renderImGui(Z80Emulator& emulator) {
 
     ImGui::Begin("Emulator Control");
 
-    // load ROM file
     if (ImGui::Button("Load ROM##loadrom")) {
         loadRomFromFile(emulator);
     }
 
-    //current program counter
+    // Program counter display
     ImGui::Text("Program Counter: 0x%04X", emulator.getProgramCounter());
 
-    if (ImGui::Button("Run##run")) {
-        emulator.run();
-    }
+    // Render calculator layout dynamically based on ROM
+    if (!buttonLayout.empty()) {
+        ImGui::Begin("Calculator");
 
-    if (ImGui::Button("Reset##reset")) {
-        emulator.reset();
-        std::cout << "Emulator reset." << std::endl;
-    }
-
-    if (ImGui::Button("Step##step")) {
-        emulator.step();
-        std::cout << "Stepped to next opcode." << std::endl;
-    }
-
-    ImGui::InputInt("Set PC##pcinput", &pcValue);
-    if (ImGui::Button("Set PC##setpc")) {
-        if (pcValue >= 0 && pcValue < 0xFFFF) {
-            emulator.setProgramCounter(static_cast<uint16_t>(pcValue));
-            std::cout << "Program Counter set to: 0x" << std::hex << pcValue << std::endl;
-        }
-        else {
-            std::cerr << "Invalid Program Counter value!" << std::endl;
-        }
-    }
-
-    ImGui::End();
-
-    if (!buttons.empty()) {
-        ImGui::Begin("Calculator ROM");
-
-        for (const Button& button : buttons) {
-            if (ImGui::Button(button.imprint.c_str())) {
-                std::cout << "Button '" << button.imprint << "' pressed!" << std::endl;
-                // TODO: add actual support for logic to calc rom
+        for (const auto& row : buttonLayout) {
+            for (const auto& button : row) {
+                // Adjust span for buttons that take up multiple columns
+                if (ImGui::Button(button.imprint.c_str(), ImVec2(50 * button.span, 50))) {
+                    std::cout << "Button '" << button.imprint << "' pressed!" << std::endl;
+                    // implement button logic here
+                }
+                ImGui::SameLine();
             }
+            ImGui::NewLine();
         }
 
         ImGui::End();
     }
+
+    ImGui::End();
 }

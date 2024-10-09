@@ -5,12 +5,14 @@
 #include <string>
 #include "CPU.hpp"
 
+// Struct to represent a button
 struct Button {
     char code;       // Button ASCII code (e.g., '0', '+', '-')
     std::string imprint;  // Imprint on the button (e.g., "0", "+")
+    int span;        // How many columns the button spans
 };
 
-extern std::vector<Button> buttons;
+extern std::vector<std::vector<Button>> buttonLayout;
 
 bool loadROM(const std::string& filepath, Z80Emulator& emulator, uint16_t startAddress);
 
