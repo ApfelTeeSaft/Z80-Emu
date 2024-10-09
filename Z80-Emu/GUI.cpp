@@ -54,54 +54,42 @@ void renderImGui(Z80Emulator& emulator) {
 
     ImGui::Begin("Emulator Control");
 
-
     if (ImGui::Button("Load ROM##loadrom")) {
         loadRomFromFile(emulator);
     }
 
-
     ImGui::Text("Program Counter: 0x%04X", emulator.getProgramCounter());
-
 
     if (ImGui::Button("Run##run")) {
         emulator.run();
-        std::cout << "Emulator started" << std::endl;
     }
 
     if (ImGui::Button("Reset##reset")) {
         emulator.reset();
-        std::cout << "Emulator reset" << std::endl;
     }
 
     if (ImGui::Button("Step##step")) {
         emulator.step();
-        std::cout << "Stepped to next opcode" << std::endl;
     }
-
 
     ImGui::InputInt("Set PC##pcinput", &pcValue);
     if (ImGui::Button("Set PC##setpc")) {
         if (pcValue >= 0 && pcValue < 0xFFFF) {
             emulator.setProgramCounter(static_cast<uint16_t>(pcValue));
-            std::cout << "Program Counter set to: 0x" << std::hex << pcValue << std::endl;
-        }
-        else {
-            std::cerr << "Invalid Program Counter value!" << std::endl;
         }
     }
 
     ImGui::End();
 
-
     if (!buttonLayout.empty()) {
         ImGui::Begin(buttonLayoutTitle.c_str());
 
+        int buttonID = 0;
         for (const auto& row : buttonLayout) {
             for (const auto& button : row) {
-
-                if (ImGui::Button(button.imprint.c_str(), ImVec2(50 * button.span, 50))) {
+                std::string buttonLabel = button.imprint + "##button" + std::to_string(buttonID++);
+                if (ImGui::Button(buttonLabel.c_str(), ImVec2(50 * button.span, 50))) {
                     std::cout << "Button '" << button.imprint << "' pressed!" << std::endl;
-
                 }
                 ImGui::SameLine();
             }

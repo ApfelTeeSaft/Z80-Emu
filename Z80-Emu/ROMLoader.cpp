@@ -31,7 +31,7 @@ bool loadROM(const std::string& filepath, Z80Emulator& emulator, uint16_t startA
     emulator.setProgramCounter(startAddress);
 
     buttonLayoutTitle.clear();
-    while (buffer[offset] != '\0' && offset < 32) {  // Read the title within the first 32 bytes
+    while (buffer[offset] != '\0' && offset < 32) {
         buttonLayoutTitle += buffer[offset++];
     }
     offset = 32;
