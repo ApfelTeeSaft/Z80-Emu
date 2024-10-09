@@ -65,48 +65,48 @@ jobs:
         echo "DEBUG: LATEST_TAG=${{ env.LATEST_TAG }}"
         echo "DEBUG: Commit Message=${{ github.event.head_commit.message }}"
 
-        - name: Determine New Version
-        id: determine_version
-        shell: pwsh
-        run: |
-          $latestVersion = "${{ env.LATEST_TAG }}"
-          echo "Using latest version: $latestVersion"
-  
-          # Split the version into major, basic, and minor components
-          $versionParts = $latestVersion -replace 'v', '' -split '\.'
-          $major = if ($versionParts[0]) { [int]$versionParts[0] } else { 1 }
-          $basic = if ($versionParts.Length -gt 1) { [int]$versionParts[1] } else { 0 }
-          $minor = if ($versionParts.Length -gt 2) { [int]$versionParts[2] } else { 0 }
-  
-          # Output debug information
-          echo "DEBUG: Major=$major Basic=$basic Minor=$minor"
-          $commitMessage = "${{ github.event.head_commit.message }}".ToLower()
-          echo "DEBUG: Commit Message=$commitMessage"
-  
-          # Determine which part of the version to increment
-          if ($commitMessage -contains "major") {
-              $major++
-              $basic = 0
-              $minor = 0
-              echo "DEBUG: Incrementing Major"
-          } elseif ($commitMessage -contains "basic") {
-              $basic++
-              $minor = 0
-              echo "DEBUG: Incrementing Basic"
-          } elseif ($commitMessage -contains "minor") {
-              $minor++
-              echo "DEBUG: Incrementing Minor"
-          } else {
-              echo "DEBUG: No increment found, keeping version as is."
-          }
-  
-          # Ensure the new version includes all three components
-          $newVersion = "v$major.$basic.$minor"
-          echo "New version determined: $newVersion"
-  
-          # Update environment variable for new version
-          echo "NEW_VERSION=$newVersion" | Out-File -FilePath $env:GITHUB_ENV -Append  
+    # Set new version based on commit message keywords and output the version
+    - name: Determine New Version
+      id: determine_version
+      shell: pwsh
+      run: |
+        $latestVersion = "${{ env.LATEST_TAG }}"
+        echo "Using latest version: $latestVersion"
 
+        # Split the version into major, basic, and minor components
+        $versionParts = $latestVersion -replace 'v', '' -split '\.'
+        $major = if ($versionParts[0]) { [int]$versionParts[0] } else { 1 }
+        $basic = if ($versionParts.Length -gt 1) { [int]$versionParts[1] } else { 0 }
+        $minor = if ($versionParts.Length -gt 2) { [int]$versionParts[2] } else { 0 }
+
+        # Output debug information
+        echo "DEBUG: Major=$major Basic=$basic Minor=$minor"
+        $commitMessage = "${{ github.event.head_commit.message }}".ToLower()
+        echo "DEBUG: Commit Message=$commitMessage"
+
+        # Determine which part of the version to increment
+        if ($commitMessage -contains "major") {
+            $major++
+            $basic = 0
+            $minor = 0
+            echo "DEBUG: Incrementing Major"
+        } elseif ($commitMessage -contains "basic") {
+            $basic++
+            $minor = 0
+            echo "DEBUG: Incrementing Basic"
+        } elseif ($commitMessage -contains "minor") {
+            $minor++
+            echo "DEBUG: Incrementing Minor"
+        } else {
+            echo "DEBUG: No increment found, keeping version as is."
+        }
+
+        # Ensure the new version includes all three components
+        $newVersion = "v$major.$basic.$minor"
+        echo "New version determined: $newVersion"
+
+        # Update environment variable for new version
+        echo "NEW_VERSION=$newVersion" | Out-File -FilePath $env:GITHUB_ENV -Append
 
     # Create a new GitHub release using the latest commit message as the body
     - name: Create GitHub Release
