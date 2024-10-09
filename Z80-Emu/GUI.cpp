@@ -61,55 +61,62 @@ void renderImGui(Z80Emulator& emulator) {
 
     if (ImGui::Button("Load ROM##loadrom")) {
         loadRomFromFile(emulator);
+        std::cout << "Load ROM button pressed." << std::endl;
     }
 
     ImGui::Text("Program Counter: 0x%04X", emulator.getProgramCounter());
 
     if (ImGui::Button("Run##run")) {
         emulator.run();
+        std::cout << "Run button pressed." << std::endl;
     }
 
     if (ImGui::Button("Reset##reset")) {
         emulator.reset();
+        std::cout << "Reset button pressed." << std::endl;
     }
 
     if (ImGui::Button("Step##step")) {
         emulator.step();
+        std::cout << "Step button pressed." << std::endl;
     }
 
     ImGui::InputInt("Set PC##pcinput", &pcValue);
     if (ImGui::Button("Set PC##setpc")) {
         if (pcValue >= 0 && pcValue < 0xFFFF) {
             emulator.setProgramCounter(static_cast<uint16_t>(pcValue));
+            std::cout << "Set Program Counter to: 0x" << std::hex << pcValue << std::endl;
         }
     }
 
     ImGui::End();
 
+    // Calculator buttons section
     if (!buttonLayout.empty()) {
         ImGui::Begin(buttonLayoutTitle.c_str());
 
         for (const auto& row : buttonLayout) {
             for (const auto& button : row) {
-                std::string buttonLabel = button.imprint + "##button" + std::to_string(rand()); // Unique button ID
+                std::string buttonLabel = button.imprint + "##button" + std::to_string(rand());  // Unique button ID
 
-                // Handle button press
+                // Check if the button is pressed
                 if (ImGui::Button(buttonLabel.c_str(), ImVec2(50 * button.span, 50))) {
                     char pressedKey = button.imprint[0];
 
-                    // Check if it's a number (0-9)
+                    std::cout << "Button pressed: " << pressedKey << std::endl;
+
+                    // Handle numbers (0-9)
                     if (pressedKey >= '0' && pressedKey <= '9') {
                         int value = pressedKey - '0';  // Convert char to int
 
-                        // Load value into emulator registers
                         if (!isOperand1Set) {
                             operand1 = operand1 * 10 + value;
-                            emulator.loadImmediateA(operand1);  // Load into register A
+                            emulator.loadImmediateA(operand1);
                             std::cout << "Operand 1: " << operand1 << std::endl;
                         }
                         else {
                             operand2 = operand2 * 10 + value;
-                            emulator.loadImmediateB(operand2);  // Load into register B
+                            emulator.loadImmediateB(operand2);
                             std::cout << "Operand 2: " << operand2 << std::endl;
                         }
                     }
@@ -118,22 +125,23 @@ void renderImGui(Z80Emulator& emulator) {
                         isOperand1Set = true;
                         operationEntered = true;
 
-                        // Add the operation opcode to mem
+                        std::cout << "Operation: " << operation << std::endl;
+
+                        // Map operator to Z80 instruction
                         switch (operation) {
                         case '+':
-                            emulator.addInstructionToMemory(0x80);  // ADD A, B opcode
+                            emulator.addInstructionToMemory(0x80);  // ADD A, B
                             break;
                         case '-':
-                            emulator.addInstructionToMemory(0x90);  // SUB A, B opcode
+                            emulator.addInstructionToMemory(0x90);  // SUB A, B
                             break;
-                            // Handle multiplication and division similarly
                         }
                     }
                     else if (pressedKey == '=') {
                         if (operationEntered) {
-                            emulator.run();  // Run the emulator to perform the operation
-                            uint8_t result = emulator.getRegisterA();  // Get the result from register A
-                            std::cout << "Result (in emulator): " << (int)result << std::endl;
+                            emulator.run();  // Run the emulator
+                            uint8_t result = emulator.getRegisterA();
+                            std::cout << "Result: " << (int)result << std::endl;
                         }
 
                         // Reset for next calculation
@@ -150,7 +158,7 @@ void renderImGui(Z80Emulator& emulator) {
                         operation = '\0';
                         isOperand1Set = false;
                         operationEntered = false;
-                        emulator.reset();  // Reset emulator state
+                        emulator.reset();
                         std::cout << "Calculator cleared." << std::endl;
                     }
                 }
