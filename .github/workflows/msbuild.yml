@@ -70,29 +70,32 @@ jobs:
       id: determine_version
       shell: pwsh
       run: |
-        $latestVersion = "${{ env.LATEST_TAG }}"
-        echo "Using latest version: $latestVersion"
-        $major = ($latestVersion -split '\.')[0] -replace 'v', ''
-        $basic = ($latestVersion -split '\.')[1]
-        $minor = ($latestVersion -split '\.')[2]
+$latestVersion = "${{ env.LATEST_TAG }}"
+echo "Using latest version: $latestVersion"
 
-        $commitMessage = "${{ github.event.head_commit.message }}".ToLower()
+# Split the version and handle missing components
+$versionParts = $latestVersion -replace 'v', '' -split '\.'
+$major = if ($versionParts[0]) { $versionParts[0] } else { "1" }
+$basic = if ($versionParts.Length -gt 1) { $versionParts[1] } else { "0" }
+$minor = if ($versionParts.Length -gt 2) { $versionParts[2] } else { "0" }
 
-        if ($commitMessage -contains "major") {
-          $major = [int]$major + 1
-          $basic = 0
-          $minor = 0
-        } elseif ($commitMessage -contains "basic") {
-          $basic = [int]$basic + 1
-          $minor = 0
-        } elseif ($commitMessage -contains "minor") {
-          $minor = [int]$minor + 1
-        }
+$commitMessage = "${{ github.event.head_commit.message }}".ToLower()
 
-        # Ensure the new version includes all three components
-        $newVersion = "v$major.$basic.$minor"
-        echo "New version determined: $newVersion"
-        echo "::set-output name=new_version::$newVersion"
+if ($commitMessage -contains "major") {
+        $major = [int]$major + 1
+        $basic = 0
+        $minor = 0
+    } elseif ($commitMessage -contains "basic") {
+        $basic = [int]$basic + 1
+        $minor = 0
+    } elseif ($commitMessage -contains "minor") {
+        $minor = [int]$minor + 1
+    }
+
+    # Ensure the new version includes all three components
+    $newVersion = "v$major.$basic.$minor"
+    echo "New version determined: $newVersion"
+    echo "::set-output name=new_version::$newVersion"
 
     # Create a new GitHub release using the latest commit message as the body
     - name: Create GitHub Release
