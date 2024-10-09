@@ -58,9 +58,9 @@ void renderImGui(Z80Emulator& emulator) {
         loadRomFromFile(emulator);
     }
 
-    // Display the current program counter
     ImGui::Text("Program Counter: 0x%04X", emulator.getProgramCounter());
 
+    // Control buttons
     if (ImGui::Button("Run##run")) {
         emulator.run();
         std::cout << "Emulator started" << std::endl;
@@ -94,15 +94,11 @@ void renderImGui(Z80Emulator& emulator) {
 
         for (const auto& row : buttonLayout) {
             for (const auto& button : row) {
-                if (button.code == '\n') {
-                    ImGui::NewLine();
+                if (ImGui::Button(button.imprint.c_str(), ImVec2(50 * button.span, 50))) {
+                    std::cout << "Button '" << button.imprint << "' pressed!" << std::endl;
+                    // Handle button press
                 }
-                else {
-                    if (ImGui::Button(button.imprint.c_str(), ImVec2(50 * button.span, 50))) {
-                        std::cout << "Button '" << button.imprint << "' pressed!" << std::endl;
-                    }
-                    ImGui::SameLine();
-                }
+                ImGui::SameLine();
             }
             ImGui::NewLine();
         }
