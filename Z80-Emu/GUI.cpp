@@ -55,6 +55,8 @@ void loadRomFromFile(Z80Emulator& emulator) {
 }
 
 void renderImGui(Z80Emulator& emulator) {
+    std::cout << "ImGui Render Loop Running" << std::endl;
+
     static int pcValue = 0x100;
 
     ImGui::Begin("Emulator Control");
@@ -169,4 +171,5 @@ void renderImGui(Z80Emulator& emulator) {
 
         ImGui::End();
     }
+    std::cout << "ImGui Render Loop Finished" << std::endl;
 }
