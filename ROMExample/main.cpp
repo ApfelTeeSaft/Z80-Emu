@@ -20,12 +20,13 @@ void generateCalculatorROM(const std::string& filepath) {
         0x81,        // ADD A, C
         0xC9         // RET
     };
-
     romFile.write(reinterpret_cast<const char*>(programData.data()), programData.size());
 
-    const char* title = "Calculator";
-    romFile.write(title, strlen(title) + 1);
+    std::string title = "Calculator";
+    title.resize(32, '\0');
+    romFile.write(title.c_str(), title.size());
 
+    // Button Layout Section (Second half)
     std::vector<uint8_t> buttonLayoutData = {
         '7', 1, 1, '7',  // Button '7'
         '8', 1, 1, '8',  // Button '8'

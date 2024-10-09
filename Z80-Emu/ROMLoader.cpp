@@ -4,12 +4,8 @@
 #include <vector>
 #include <cstring>
 
-
 std::vector<std::vector<Button>> buttonLayout;
-
-
 std::string buttonLayoutTitle;
-
 
 bool loadROM(const std::string& filepath, Z80Emulator& emulator, uint16_t startAddress) {
     std::ifstream file(filepath, std::ios::binary);
@@ -27,7 +23,6 @@ bool loadROM(const std::string& filepath, Z80Emulator& emulator, uint16_t startA
         return false;
     }
 
-
     size_t offset = 0;
     size_t halfSize = buffer.size() / 2;
     for (size_t i = 0; i < halfSize; ++i) {
@@ -35,15 +30,13 @@ bool loadROM(const std::string& filepath, Z80Emulator& emulator, uint16_t startA
     }
     emulator.setProgramCounter(startAddress);
 
-
     buttonLayoutTitle.clear();
-    while (buffer[offset] != '\0' && offset < buffer.size()) {
+    while (buffer[offset] != '\0' && offset < 32) {  // Read the title within the first 32 bytes
         buttonLayoutTitle += buffer[offset++];
     }
-    offset++;
+    offset = 32;
 
     std::cout << "Layout Title: " << buttonLayoutTitle << std::endl;
-
 
     buttonLayout.clear();
     while (offset < buffer.size()) {
@@ -68,7 +61,8 @@ bool loadROM(const std::string& filepath, Z80Emulator& emulator, uint16_t startA
             std::cerr << "Error: Imprint size out of bounds." << std::endl;
             break;
         }
-        std::string imprint((char*)&buffer[offset], imprintSize);
+
+        std::string imprint(reinterpret_cast<const char*>(&buffer[offset]), imprintSize);
         offset += imprintSize;
 
         if (buttonLayout.empty()) {
