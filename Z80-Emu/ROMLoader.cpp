@@ -2,18 +2,10 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include "CPU.hpp"
 
-// structure to store button layout information
-struct Button {
-    char code;       // Button ASCII code (e.g., '0', '+', '-')
-    std::string imprint;  // Imprint on the button (e.g., "0", "+")
-    int span;        // How many columns the button spans
-};
-
-// vector to store the button layout
 std::vector<std::vector<Button>> buttonLayout;
 
-// load a .rom file into the emulator's memory and button layout
 bool loadROM(const std::string& filepath, Z80Emulator& emulator, uint16_t startAddress) {
     std::ifstream file(filepath, std::ios::binary);
     if (!file.is_open()) {
@@ -30,13 +22,9 @@ bool loadROM(const std::string& filepath, Z80Emulator& emulator, uint16_t startA
         return false;
     }
 
-    // size of each section (program and layout)
     size_t halfSize = buffer.size() / 2;
-
-    std::cout << "Program section loaded into memory from " << std::hex << startAddress << std::endl;
     for (size_t i = 0; i < halfSize; ++i) {
         emulator.memory[startAddress + i] = buffer[i];
-        std::cout << "Memory[" << std::hex << (startAddress + i) << "] = " << std::hex << (int)emulator.memory[startAddress + i] << std::endl;
     }
     emulator.setProgramCounter(startAddress);
 
@@ -54,7 +42,6 @@ bool loadROM(const std::string& filepath, Z80Emulator& emulator, uint16_t startA
             offset += imprintSize;
 
             rowButtons.push_back(Button{ code, imprint, span });
-
             if (rowButtons.size() >= 4) {
                 break;
             }
